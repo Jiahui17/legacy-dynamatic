@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#Author: Andrea Guerrieri - EPFL-LAP email:andrea.guerrieri@epfl.ch
+#Dynamatic hdl writer script
+#ver.1.0
+
+
+HDL_DIR=hdl
+SCRIPTS_DIR=scripts
+
+
+
+dot2vhdl $2
+
+#conv_dc $1
+
+mkdir -p $1/$HDL_DIR
+
+
+mv $1/reports/*.{vhd,v,tcl} $1/$HDL_DIR
+
+cp $DHLS_INSTALL_DIR/etc/dynamatic/components/VHDL/*.{vhd,v,tcl} $1/$HDL_DIR
+cp $DHLS_INSTALL_DIR/etc/dynamatic/components/ip/*.{vhd,v,tcl} $1/$HDL_DIR
+
+
+mv -f *.v $1/$HDL_DIR > /dev/null 2>&1
+
+rm -f *.fir > /dev/null 2>&1
+
+rm -f *.json > /dev/null 2>&1
+
+mkdir -p $1/$SCRIPTS_DIR
+
+mv -f $1/reports/*.tcl $1/$SCRIPTS_DIR
+rm -r $1/$SCRIPTS_DIR
+
+rm -f $1/reports/*.txt
+
+
+

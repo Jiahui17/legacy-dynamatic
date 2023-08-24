@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+import re, argparse, subprocess, os, sys
+import pygraphviz as pgv
+from vcdvcd import VCDVCD
+from os.path import isdir, basename
+from glob import glob
+
+CP = 4000000 # clock period = 4ns = 4000000fs
+
+def run(*args, **kwargs):
+	sys.stdout.flush()
+	return subprocess.run(*args,**kwargs,check=True) 
+
+def get_gv_edges(gv):
+	return map(lambda e : gv.get_edge(*e), gv.edges(keys=True))
+
+def get_gv_nodes(gv):
+	return map(lambda n : gv.get_node(n), gv.nodes())
+
+def main(cycles):
+
+	proj_name = basename(glob('./src/*.cpp')[0]).replace('.cpp', '')
+
+	dotfile = f'./reports/{proj_name}_optimized.dot'
+	with open('./sim/HLS_VERIFY/simulation.do', 'r') as f:
+		vsim_script = f.read().split('\n')
+
+	for idx, line in enumerate(vsim_script):
+		if re.search(r'eval vsim', line): break
+	else: assert False 
+	vsim_script.insert(idx+1, 'vcd file trace.vcd\nvcd add duv/*')
+
+	for idx, line in enumerate(vsim_script):
+		if re.search(r'run -all', line):
+			vsim_script[idx] = f"run {int(cycles * 4)} ns"
+	
+	with open('./sim/HLS_VERIFY/dump_vcd.do', 'w') as f:
+		f.write('\n'.join(vsim_script))
+	
+	print("re-running vsim to generate vcd file")
+	#run(['vsim', '-c', '-do', 'dump_vcd.do'], cwd='./sim/HLS_VERIFY', stdout = subprocess.DEVNULL)
+	run(['vsim', '-c', '-do', 'dump_vcd.do'], cwd='./sim/HLS_VERIFY')
+	
+	print("visualizing the traces using graphviz dot")
+	vcd = VCDVCD('./sim/HLS_VERIFY/trace.vcd') # vcd trace
+	frames = []
+	for cycle in range(cycles):
+		gv = pgv.AGraph(dotfile , strict=False, directed=True)
+		vrkeys = [ k for k in vcd.references_to_ids.keys() if re.search(r'duv\.\w+(validArray|readyArray)', k)] # valid-ready signal names
+		# for each valid-ready signal
+		for k in vrkeys:
+			unit, sigtype, id_ = re.search(r'duv\.(\w+)_(valid|ready)Array_(\d+)', k).group(1, 2, 3)
+			unit = re.sub('Buffer', '_Buffer', unit)
+			value = vcd[k][cycle * CP]
+			gv.get_node(unit).attr[sigtype + id_] = value
+			if sigtype == 'valid' and value == '1': # if the node has at least valid signal at one port:
+				gv.get_node(unit).attr['style'] = 'filled'
+				gv.get_node(unit).attr['fillcolor'] = 'goldenrod1'
+		for e in get_gv_edges(gv):
+			n = gv.get_node(e[0])
+			v = gv.get_node(e[1])
+			from_ = str(int(e.attr['from'].replace('out', '')) - 1)
+			to_   = str(int(e.attr['to'].replace('in', '')) - 1)
+			if n.attr['valid' + from_] == '1' and v.attr['ready' + to_] == '1':
+				e.attr['color'] = 'x11green'
+				e.attr['penwidth'] = '4.5'
+			elif n.attr['valid' + from_] == '1' and v.attr['ready' + to_] == '0':
+				e.attr['color'] = 'orangered'
+				e.attr['penwidth'] = '4.5'
+		filename = f'cycle_{cycle}.pdf'
+		gv.draw(filename, prog='dot')
+		frames.append(filename)
+	run(['pdfunite'] + frames + ['trace.pdf'])
+	run(['rm'] + frames)
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description="command line tester for parsing the trace")
+	parser.add_argument('--cycles', type=int, help='simulation snapshot at cycle', default=50)
+	args = parser.parse_args()
+	main(args.cycles)
