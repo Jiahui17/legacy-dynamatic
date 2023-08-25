@@ -31,7 +31,6 @@ __pycache__/
 *.s
 *.tcl
 *.v
-*.vhd
 *.xdc
 *.zip
 *.jou
