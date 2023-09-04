@@ -114,8 +114,11 @@ entity read_data_signals is
 end entity;
 
 architecture arch of read_data_signals is
-	signal sel_prev : std_logic_vector(ARBITER_SIZE - 1 downto 0);
+	signal sel_prev : std_logic_vector(ARBITER_SIZE - 1 downto 0) := (others => '0');
 	signal out_reg: data_array(ARBITER_SIZE - 1 downto 0)(DATA_WIDTH - 1 downto 0);
+
+	-- a vector indicates if the out_reg(I) contains valid data
+	signal full : std_logic_vector (ARBITER_SIZE - 1 downto 0) := (others => '0');
 begin
 
 	process(clk, rst) is
@@ -144,22 +147,45 @@ begin
 
 	process(clk, rst) is
 	begin
+		for I in 0 to ARBITER_SIZE - 1 loop
+			assert ( (not full(I)) or (not sel_prev(I)) )
+				report "By construction, when the cell is full, the memory access should not be granted!"
+				severity failure;
+			if (rst) then
+				full(I) <= '0';
+			elsif (rising_edge(clk)) then
+				if (nReady(I)) then
+					-- if nReady(I) = '1', then no matter how, in the next cycle
+					-- the value of full will be 0 
+					full(I) <= '0';
+				elsif (sel_prev(I)) then
+					-- if the 
+					full(I) <= '1';
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	process(clk, rst) is
+	begin
 		if (rising_edge(clk)) then
 		for I in 0 to ARBITER_SIZE - 1 loop
-				if (sel_prev(I) = '1') then
-					out_reg(I) <= read_data;
-				end if;
+			if (sel_prev(I) = '1') then
+				out_reg(I) <= read_data;
+			end if;
 		end loop;
 		end if;
 	end process;
 
-	process(read_data, sel_prev, out_reg) is
+	process(read_data, sel_prev, out_reg, full) is
 	begin
 		for I in 0 to ARBITER_SIZE - 1 loop
-			if (sel_prev(I) = '1') then
-				out_data(I) <= read_data;
-			else
+			if (full(I)) then
+				-- if out_reg contains valid data
 				out_data(I) <= out_reg(I);
+			else
+				-- otherwise, just read from the memory port
+				out_data(I) <= read_data;
 			end if;
 		end loop;
 	end process;
