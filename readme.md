@@ -44,3 +44,6 @@ git clone https://github.com/Jiahui17/dynamatic.git $INSTALL_DIR/Dynamatic/etc/d
 cd $INSTALL_DIR/Dynamatic/etc/dynamatic && bash build.sh
 ```
 
+## Regression Test
+
+Please refer to `./Regression_test/readme.md`
