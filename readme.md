@@ -1,8 +1,8 @@
-# the Dynamatic HLS Compiler (A fork for formal verification)
+# The Dynamatic HLS Compiler (A fork for formal verification)
 
 For official repository please checkout https://github.com/lana555/dynamatic
 
-## Installation (Tested on Ubuntu/Debian based disto)
+## Installation (Tested on Ubuntu/Debian based distributions)
 
 Install dependencies:
 ```sh
