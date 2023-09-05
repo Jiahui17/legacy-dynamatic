@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Kill the whole script on Ctrl+C
+trap "exit" INT
+
+# shorthand function for printing a message and throw an error
+function fail {
+	printf '[ERROR] %s\n' "$1" >&2 # message to stderr
+	exit "${2-1}"          # return code specified by $2, or 1 by default
+}
+
+# this script is a utility script for starting the functional verification
+# usage: run_verifier . (notice the dot at the end, you can omit the dot, and
+# make sure that you are currently in a directory with src/ and hdl/)
+
+
+[ ! -z $1 ] && PROJ_DIR=$1 || PROJ_DIR="$(realpath .)"
+
+[ -d $PROJ_DIR/src ] || \
+	fail 'this directory does not look like a dynamatic project directory.'
+
+[ -d $PROJ_DIR/hdl ] || \
+	fail 'no synthesized hdl found. Are you sure that you already ran the synthesis?'
+
+PROJ_NAME=$(basename $(ls ${PROJ_DIR}/src/*.cpp| head -1) | sed 's/.cpp//g')
+TOP_FILE="${PROJ_NAME}.cpp"
+
+# perform functional verification
+mkdir -p "${PROJ_DIR}/sim/"{C_SRC,VHDL_SRC,REF_OUT,HLS_VERIFY,INPUT_VECTORS,VHDL_OUT}
+
+# root directory of verify project
+VERIFY_DIR="${PROJ_DIR}/sim"
+
+# copy the c++ source code into directory C_SRC
+cp "${PROJ_DIR}"/src/*.{cpp,h} "${VERIFY_DIR}"/C_SRC 2> /dev/null
+
+# copy the hdl source code into directory VHDL_SRC
+cp "${PROJ_DIR}"/hdl/* "${VERIFY_DIR}"/VHDL_SRC 2> /dev/null
+
+rm -r "${PROJ_DIR}/sim/HLS_VERIFY/work" 2> /dev/null
+
+# verifier requires you to be in HLS_VERIFY directory to work
+cd "${PROJ_DIR}/sim/HLS_VERIFY"
+
+# run the verifier and save the log
+hlsverifier cover -aw32 "../C_SRC/${TOP_FILE}" "../C_SRC/${TOP_FILE}" "${PROJ_NAME}" \
+	| tee ${PROJ_DIR}/reports/hls_verify.log || fail 'hlsverifier failed!'
