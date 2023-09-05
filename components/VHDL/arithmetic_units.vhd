@@ -1349,12 +1349,12 @@ architecture arch of fcmp_olt_op is
 
 	signal join_valid : STD_LOGIC;
 	constant alu_opcode : std_logic_vector(4 downto 0) := "00100";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-    --TODO check with lana
 	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
-
 
 	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
 	generic map (
@@ -1368,23 +1368,24 @@ begin
 			   reset => rst,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   opcode => alu_opcode,
 			   dout(0) => dataOutArray(0)(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(1)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
 end architecture;
 
