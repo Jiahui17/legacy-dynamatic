@@ -1,3 +1,13 @@
+#!/usr/bin/env bash
+
+# Kill the whole script on Ctrl+C
+trap "exit" INT
+
+# shorthand function for printing a message and throw an error
+function fail {
+	printf '[ERROR] %s\n' "$1" >&2 # message to stderr
+	exit "${2-1}"          # return code specified by $2, or 1 by default
+}
 
 
 CLANG=$CLANG_DIR/clang # change depending on where your installation of clang is
@@ -44,29 +54,22 @@ OPTIMIZATION_FLAGS= #-fno-builtin, -fno-vectorize
 
 #mkdir -p $BUILDDIR
 cd $BUILDDIR
-mkdir -p $REPORT_DIR
-mkdir -p $HDL_DIR
-mkdir -p $DEBUG_DIR
+mkdir -p $REPORT_DIR $HDL_DIR $DEBUG_DIR
 
 echo "$CLANG -emit-llvm -S $OPTIMIZATION_LEVEL $OPTIMIZATION_FLAGS -c $SRC_DIR/$name -o .$name.ll"
 
-#LLVM 3.8
-#$CLANG -emit-llvm -S $OPTIMIZATION_LEVEL $OPTIMIZATION_FLAGS -c $name.cpp -o $name.ll
-#$OPT -mem2reg $name.ll -S -o $name"_mem2reg.ll"
-#$OPT -loop-rotate -constprop  $name"_mem2reg.ll" -S -o $name"_mem2reg_constprop.ll"
-##$(OPT) -constprop  $(BUILDDIR)/$(name)_mem2reg.ll -S -o $(BUILDDIR)/$(name)_mem2reg_constprop.ll
-#$OPT -simplifycfg  $name"_mem2reg_constprop.ll" -S -o $name"_mem2reg_constprop_simplifycfg.ll"
-#$OPT -die -instcombine $name"_mem2reg_constprop_simplifycfg.ll" -S -o $name"_mem2reg_constprop_simplifycfg_die.ll"
 
 #LLVM 6.0
+
+{
 $CLANG -Xclang -disable-O0-optnone -emit-llvm -S $OPTIMIZATION_LEVEL $OPTIMIZATION_FLAGS -c $SRC_DIR/$name -o .$name.ll
 $OPT -mem2reg .$name.ll -S -o .$name"_mem2reg.ll"
 $OPT -loop-rotate -constprop  .$name"_mem2reg.ll" -S -o .$name"_mem2reg_constprop.ll"
 #$(OPT) -constprop  $(BUILDDIR)/$(name)_mem2reg.ll -S -o $(BUILDDIR)/$(name)_mem2reg_constprop.ll
 $OPT -simplifycfg .$name"_mem2reg_constprop.ll" -S -o .$name"_mem2reg_constprop_simplifycfg.ll"
 $OPT -die -instcombine -lowerswitch .$name"_mem2reg_constprop_simplifycfg.ll" -S -o .$name"_mem2reg_constprop_simplifycfg_die.ll"
+} || fail 'Clang frontend failed!'
 #Abdullah: Added -lowerswitch flag to handle switch to branch conversion.
-
 
 cc -c $PASS_DIR/FrequencyCounterPass/log_FrequencyCounter.c
 $CLANG -Xclang -load -Xclang $PASS_DIR/_build/FrequencyCounterPass/libFrequencyCounterPass.so -c .$name"_mem2reg_constprop_simplifycfg_die.ll"
@@ -76,17 +79,6 @@ rm a.out .$name"_mem2reg_constprop_simplifycfg_die.o" log_FrequencyCounter.o
 
 $CLANG -Xclang -load -Xclang $PASS_DIR/_build/FrequencyDataGatherPass/libFrequencyDataGatherPass.so .$name"_mem2reg_constprop_simplifycfg_die.ll" -S
 rm *.s
-
-
-#Shabnam
-
-
-#$OPT \
-#-load $PASS_DIR/_build/ElasticPass/libElasticPass.so \
-#-load $PASS_DIR/_build/OptimizeBitwidth/libLLVMOptimizeBitWidth.so \
-#-load $PASS_DIR/_build/MyCFGPass/libMyCFGPass.so \
-#-mycfgpass  $name"_mem2reg_constprop_simplifycfg_die.ll" -S
-
 
 $OPT \
 -load $PASS_DIR/_build/MemElemInfo/libLLVMMemElemInfo.so \
