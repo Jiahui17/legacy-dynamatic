@@ -1092,10 +1092,11 @@ architecture arch of fcmp_oeq_op is
 
 	signal join_valid : STD_LOGIC;
 	constant alu_opcode : std_logic_vector(4 downto 0) := "00001";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-    --TODO check with lana
 	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
 	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
@@ -1110,30 +1111,30 @@ begin
 			   reset => rst,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   opcode => alu_opcode,
-			   dout(0) => dataOutArray(0)(0)
-		   );
+			   dout(0) => dataOutArray(0)(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(1)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut);
 
 end architecture;
 
 -----------------------------------------------------------------------
 -- fcmp ogt, version 0.0
 -----------------------------------------------------------------------
+
 Library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -1177,12 +1178,12 @@ architecture arch of fcmp_ogt_op is
 
 	signal join_valid : STD_LOGIC;
 	constant alu_opcode : std_logic_vector(4 downto 0) := "00010";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-    --TODO check with lana
 	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
-
 
 	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
 	generic map (
@@ -1196,29 +1197,30 @@ begin
 			   reset => rst,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   opcode => alu_opcode,
 			   dout(0) => dataOutArray(0)(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(1)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut);
 
 end architecture;
+
 -----------------------------------------------------------------------
 -- fcmp oge, version 0.0
--- TODO
 -----------------------------------------------------------------------
+
 Library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -1262,12 +1264,12 @@ architecture arch of fcmp_oge_op is
 
 	signal join_valid : STD_LOGIC;
 	constant alu_opcode : std_logic_vector(4 downto 0) := "00011";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-    --TODO check with lana
 	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
-
 
 	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
 	generic map (
@@ -1281,31 +1283,30 @@ begin
 			   reset => rst,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   opcode => alu_opcode,
 			   dout(0) => dataOutArray(0)(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(1)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
-
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut);
 
 end architecture;
 
 -----------------------------------------------------------------------
 -- fcmp olt, version 0.0
--- TODO
 -----------------------------------------------------------------------
+
 Library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -1392,7 +1393,6 @@ end architecture;
 
 -----------------------------------------------------------------------
 -- fcmp ole, version 0.0
--- TODO
 -----------------------------------------------------------------------
 
 Library IEEE;
@@ -1437,12 +1437,12 @@ architecture arch of fcmp_ole_op is
 
 	signal join_valid : STD_LOGIC;
 	constant alu_opcode : std_logic_vector(4 downto 0) := "00101";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-    --TODO check with lana
 	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
-
 
 	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
 	generic map (
@@ -1456,30 +1456,32 @@ begin
 			   reset => rst,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   opcode => alu_opcode,
 			   dout(0) => dataOutArray(0)(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(1)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
 
 end architecture;
+
 -----------------------------------------------------------------------
 -- fcmp one, version 0.0
--- TODO
 -----------------------------------------------------------------------
+
 Library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -1523,12 +1525,12 @@ architecture arch of fcmp_one_op is
 
 	signal join_valid : STD_LOGIC;
 	constant alu_opcode : std_logic_vector(4 downto 0) := "00110";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-    --TODO check with lana
 	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
-
 
 	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
 	generic map (
@@ -1542,112 +1544,113 @@ begin
 			   reset => rst,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   opcode => alu_opcode,
 			   dout(0) => dataOutArray(0)(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(1)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
-
-end architecture;
-
------------------------------------------------------------------------
--- fcmp ord, version 0.0
--- TODO
------------------------------------------------------------------------
-
-Library IEEE;
-use IEEE.std_logic_1164.all;
-use ieee.numeric_std.all;
-use work.customTypes.all;
-
-entity fcmp_ord_op is
-	Generic (
-	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
-);
-port(
-clk, rst : in std_logic; 
-dataInArray : in data_array (1 downto 0)(DATA_SIZE_IN-1 downto 0); 
-dataOutArray : out data_array (0 downto 0)(DATA_SIZE_OUT-1 downto 0);      
-pValidArray : in std_logic_vector(1 downto 0);
-nReadyArray : in std_logic_vector(0 downto 0);
-validArray : out std_logic_vector(0 downto 0);
-readyArray : out std_logic_vector(1 downto 0));
-end entity;
-
-architecture arch of fcmp_ord_op is
-
-	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
-
-begin 
-
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
-
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
 
 end architecture;
 
------------------------------------------------------------------------
--- fcmp uno, version 0.0
--- TODO
------------------------------------------------------------------------
+-- -----------------------------------------------------------------------
+-- -- fcmp ord, version 0.0
+-- -- TODO
+-- -----------------------------------------------------------------------
+-- 
+-- Library IEEE;
+-- use IEEE.std_logic_1164.all;
+-- use ieee.numeric_std.all;
+-- use work.customTypes.all;
+-- 
+-- entity fcmp_ord_op is
+-- 	Generic (
+-- 	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
+-- );
+-- port(
+-- clk, rst : in std_logic; 
+-- dataInArray : in data_array (1 downto 0)(DATA_SIZE_IN-1 downto 0); 
+-- dataOutArray : out data_array (0 downto 0)(DATA_SIZE_OUT-1 downto 0);      
+-- pValidArray : in std_logic_vector(1 downto 0);
+-- nReadyArray : in std_logic_vector(0 downto 0);
+-- validArray : out std_logic_vector(0 downto 0);
+-- readyArray : out std_logic_vector(1 downto 0));
+-- end entity;
+-- 
+-- architecture arch of fcmp_ord_op is
+-- 
+-- 	signal join_valid : STD_LOGIC;
+-- 	signal one: std_logic_vector (0 downto 0) := "1";
+-- 	signal zero: std_logic_vector (0 downto 0) := "0";
+-- 
+-- begin 
+-- 
+-- 	join_write_temp:   entity work.join(arch) generic map(2)
+-- 	port map( pValidArray,  --pValidArray
+-- 	nReadyArray(0),     --nready                    
+-- 	join_valid,         --valid          
+-- 	readyArray);   --readyarray 
+-- 
+-- 	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
+-- 	validArray(0) <= join_valid;
+-- 
+-- end architecture;
 
-Library IEEE;
-use IEEE.std_logic_1164.all;
-use ieee.numeric_std.all;
-use work.customTypes.all;
-
-entity fcmp_uno_op is
-	Generic (
-	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
-);
-port(
-clk, rst : in std_logic; 
-dataInArray : in data_array (1 downto 0)(DATA_SIZE_IN-1 downto 0); 
-dataOutArray : out data_array (0 downto 0)(DATA_SIZE_OUT-1 downto 0);      
-pValidArray : in std_logic_vector(1 downto 0);
-nReadyArray : in std_logic_vector(0 downto 0);
-validArray : out std_logic_vector(0 downto 0);
-readyArray : out std_logic_vector(1 downto 0));
-end entity;
-
-architecture arch of fcmp_uno_op is
-
-	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
-
-begin 
-
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
-
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
-
-end architecture;
+-- -----------------------------------------------------------------------
+-- -- fcmp uno, version 0.0
+-- -- TODO
+-- -----------------------------------------------------------------------
+-- 
+-- Library IEEE;
+-- use IEEE.std_logic_1164.all;
+-- use ieee.numeric_std.all;
+-- use work.customTypes.all;
+-- 
+-- entity fcmp_uno_op is
+-- 	Generic (
+-- 	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
+-- );
+-- port(
+-- clk, rst : in std_logic; 
+-- dataInArray : in data_array (1 downto 0)(DATA_SIZE_IN-1 downto 0); 
+-- dataOutArray : out data_array (0 downto 0)(DATA_SIZE_OUT-1 downto 0);      
+-- pValidArray : in std_logic_vector(1 downto 0);
+-- nReadyArray : in std_logic_vector(0 downto 0);
+-- validArray : out std_logic_vector(0 downto 0);
+-- readyArray : out std_logic_vector(1 downto 0));
+-- end entity;
+-- 
+-- architecture arch of fcmp_uno_op is
+-- 
+-- 	signal join_valid : STD_LOGIC;
+-- 	signal one: std_logic_vector (0 downto 0) := "1";
+-- 	signal zero: std_logic_vector (0 downto 0) := "0";
+-- 
+-- begin 
+-- 
+-- 	join_write_temp:   entity work.join(arch) generic map(2)
+-- 	port map( pValidArray,  --pValidArray
+-- 	nReadyArray(0),     --nready                    
+-- 	join_valid,         --valid          
+-- 	readyArray);   --readyarray 
+-- 
+-- 	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
+-- 	validArray(0) <= join_valid;
+-- 
+-- end architecture;
 
 -----------------------------------------------------------------------
 -- fcmp ueq, version 0.0
@@ -1675,20 +1678,65 @@ end entity;
 
 architecture arch of fcmp_ueq_op is
 
+    --Interface to vivado component
+	component array_RAM_fcmp_32cud is
+		generic (
+				  ID         : integer := 1;
+				  NUM_STAGE  : integer := 2;
+				  din0_WIDTH : integer := 32;
+				  din1_WIDTH : integer := 32;
+				  dout_WIDTH : integer := 1
+			  );
+		port (
+			     clk    : in  std_logic;
+			     reset  : in  std_logic;
+			     ce     : in  std_logic;
+			     din0   : in  std_logic_vector(din0_WIDTH-1 downto 0);
+			     din1   : in  std_logic_vector(din1_WIDTH-1 downto 0);
+			     opcode : in  std_logic_vector(4 downto 0);
+			     dout   : out std_logic_vector(dout_WIDTH-1 downto 0)
+		     );
+	end component;
+
 	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
+	constant alu_opcode : std_logic_vector(4 downto 0) := "00001";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	-- TODO: here i am using exactly the same implementation as fcmp_oeq_op
+	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
+	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
+	generic map (
+				ID => 1,
+				NUM_STAGE => 2,
+				din0_WIDTH => 32,
+				din1_WIDTH => 32,
+				dout_WIDTH => 1)
+	port map (
+			   clk => clk,
+			   reset => rst,
+			   din0 => dataInArray(0),
+			   din1 => dataInArray(1),
+			   ce => oehb_ready,
+			   opcode => alu_opcode,
+			   dout(0) => dataOutArray(0)(0));
+
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
+
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut);
 
 end architecture;
 
@@ -1718,20 +1766,65 @@ end entity;
 
 architecture arch of fcmp_uge_op is
 
+    --Interface to vivado component
+	component array_RAM_fcmp_32cud is
+		generic (
+				  ID         : integer := 1;
+				  NUM_STAGE  : integer := 2;
+				  din0_WIDTH : integer := 32;
+				  din1_WIDTH : integer := 32;
+				  dout_WIDTH : integer := 1
+			  );
+		port (
+			     clk    : in  std_logic;
+			     reset  : in  std_logic;
+			     ce     : in  std_logic;
+			     din0   : in  std_logic_vector(din0_WIDTH-1 downto 0);
+			     din1   : in  std_logic_vector(din1_WIDTH-1 downto 0);
+			     opcode : in  std_logic_vector(4 downto 0);
+			     dout   : out std_logic_vector(dout_WIDTH-1 downto 0)
+		     );
+	end component;
+
 	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
+	constant alu_opcode : std_logic_vector(4 downto 0) := "00011";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	-- TODO: here the implementation is exactly the same as fcmp_oge_op
+	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
+	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
+	generic map (
+				ID => 1,
+				NUM_STAGE => 2,
+				din0_WIDTH => 32,
+				din1_WIDTH => 32,
+				dout_WIDTH => 1)
+	port map (
+			   clk => clk,
+			   reset => rst,
+			   din0 => dataInArray(0),
+			   din1 => dataInArray(1),
+			   ce => oehb_ready,
+			   opcode => alu_opcode,
+			   dout(0) => dataOutArray(0)(0));
+
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
+
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut);
 
 end architecture;
 
@@ -1761,20 +1854,66 @@ end entity;
 
 architecture arch of fcmp_ult_op is
 
+	-- TODO: for now, the implementation of fcmp_ult_op is identical to fcmp_olt_op
+    --Interface to vivado component
+	component array_RAM_fcmp_32cud is
+		generic (
+				  ID         : integer := 1;
+				  NUM_STAGE  : integer := 2;
+				  din0_WIDTH : integer := 32;
+				  din1_WIDTH : integer := 32;
+				  dout_WIDTH : integer := 1
+			  );
+		port (
+			     clk    : in  std_logic;
+			     reset  : in  std_logic;
+			     ce     : in  std_logic;
+			     din0   : in  std_logic_vector(din0_WIDTH-1 downto 0);
+			     din1   : in  std_logic_vector(din1_WIDTH-1 downto 0);
+			     opcode : in  std_logic_vector(4 downto 0);
+			     dout   : out std_logic_vector(dout_WIDTH-1 downto 0)
+		     );
+	end component;
+
 	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
+	constant alu_opcode : std_logic_vector(4 downto 0) := "00100";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
+	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
+	generic map (
+				ID => 1,
+				NUM_STAGE => 2,
+				din0_WIDTH => 32,
+				din1_WIDTH => 32,
+				dout_WIDTH => 1)
+	port map (
+			   clk => clk,
+			   reset => rst,
+			   din0 => dataInArray(0),
+			   din1 => dataInArray(1),
+			   ce => oehb_ready,
+			   opcode => alu_opcode,
+			   dout(0) => dataOutArray(0)(0));
+
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
+
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
 end architecture;
 
@@ -1788,7 +1927,7 @@ use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.customTypes.all;
 
-entity fcmp_ule is
+entity fcmp_ule_op is
 	Generic (
 	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
 );
@@ -1802,22 +1941,68 @@ validArray : out std_logic_vector(0 downto 0);
 readyArray : out std_logic_vector(1 downto 0));
 end entity;
 
-architecture arch of fcmp_ule is
+architecture arch of fcmp_ule_op is
+
+	-- TODO: for now, the implementation of fcmp_ule_op is identical to fcmp_ole_op
+	  --Interface to vivado component
+	component array_RAM_fcmp_32cud is
+		generic (
+				  ID         : integer := 1;
+				  NUM_STAGE  : integer := 2;
+				  din0_WIDTH : integer := 32;
+				  din1_WIDTH : integer := 32;
+				  dout_WIDTH : integer := 1
+			  );
+		port (
+			     clk    : in  std_logic;
+			     reset  : in  std_logic;
+			     ce     : in  std_logic;
+			     din0   : in  std_logic_vector(din0_WIDTH-1 downto 0);
+			     din1   : in  std_logic_vector(din1_WIDTH-1 downto 0);
+			     opcode : in  std_logic_vector(4 downto 0);
+			     dout   : out std_logic_vector(dout_WIDTH-1 downto 0)
+		     );
+	end component;
 
 	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
+	constant alu_opcode : std_logic_vector(4 downto 0) := "00101";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
+	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
+	generic map (
+				ID => 1,
+				NUM_STAGE => 2,
+				din0_WIDTH => 32,
+				din1_WIDTH => 32,
+				dout_WIDTH => 1)
+	port map (
+			   clk => clk,
+			   reset => rst,
+			   din0 => dataInArray(0),
+			   din1 => dataInArray(1),
+			   ce => oehb_ready,
+			   opcode => alu_opcode,
+			   dout(0) => dataOutArray(0)(0));
+
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
+
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
 end architecture;
 
@@ -1831,7 +2016,7 @@ use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.customTypes.all;
 
-entity fcmp_une is
+entity fcmp_une_op is
 	Generic (
 	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
 );
@@ -1845,22 +2030,68 @@ validArray : out std_logic_vector(0 downto 0);
 readyArray : out std_logic_vector(1 downto 0));
 end entity;
 
-architecture arch of fcmp_une is
+architecture arch of fcmp_une_op is
+
+	-- TODO: for now the implementation of fcmp_une_op is the same as fcmp_one_op
+	  --Interface to vivado component
+	component array_RAM_fcmp_32cud is
+		generic (
+				  ID         : integer := 1;
+				  NUM_STAGE  : integer := 2;
+				  din0_WIDTH : integer := 32;
+				  din1_WIDTH : integer := 32;
+				  dout_WIDTH : integer := 1
+			  );
+		port (
+			     clk    : in  std_logic;
+			     reset  : in  std_logic;
+			     ce     : in  std_logic;
+			     din0   : in  std_logic_vector(din0_WIDTH-1 downto 0);
+			     din1   : in  std_logic_vector(din1_WIDTH-1 downto 0);
+			     opcode : in  std_logic_vector(4 downto 0);
+			     dout   : out std_logic_vector(dout_WIDTH-1 downto 0)
+		     );
+	end component;
 
 	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
+	constant alu_opcode : std_logic_vector(4 downto 0) := "00110";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
+	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
+	generic map (
+				ID => 1,
+				NUM_STAGE => 2,
+				din0_WIDTH => 32,
+				din1_WIDTH => 32,
+				dout_WIDTH => 1)
+	port map (
+			   clk => clk,
+			   reset => rst,
+			   din0 => dataInArray(0),
+			   din1 => dataInArray(1),
+			   ce => oehb_ready,
+			   opcode => alu_opcode,
+			   dout(0) => dataOutArray(0)(0));
+
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
+
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
 end architecture;
 
@@ -1874,7 +2105,7 @@ use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.customTypes.all;
 
-entity fcmp_ugt is
+entity fcmp_ugt_op is
 	Generic (
 	INPUTS:integer; OUTPUTS:integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
 );
@@ -1888,22 +2119,67 @@ validArray : out std_logic_vector(0 downto 0);
 readyArray : out std_logic_vector(1 downto 0));
 end entity;
 
-architecture arch of fcmp_ugt is
+architecture arch of fcmp_ugt_op is
+
+	-- TODO: the implementation of fcmp_ogt_op is identical to fcmp_ugt_op
+    --Interface to vivado component
+	component array_RAM_fcmp_32cud is
+		generic (
+				  ID         : integer := 1;
+				  NUM_STAGE  : integer := 2;
+				  din0_WIDTH : integer := 32;
+				  din1_WIDTH : integer := 32;
+				  dout_WIDTH : integer := 1
+			  );
+		port (
+			     clk    : in  std_logic;
+			     reset  : in  std_logic;
+			     ce     : in  std_logic;
+			     din0   : in  std_logic_vector(din0_WIDTH-1 downto 0);
+			     din1   : in  std_logic_vector(din1_WIDTH-1 downto 0);
+			     opcode : in  std_logic_vector(4 downto 0);
+			     dout   : out std_logic_vector(dout_WIDTH-1 downto 0)
+		     );
+	end component;
 
 	signal join_valid : STD_LOGIC;
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
+	constant alu_opcode : std_logic_vector(4 downto 0) := "00010";
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
 begin 
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray 
+	dataOutArray(0)(DATA_SIZE_OUT - 1 downto 1) <= (others => '0');
 
-	dataOutArray(0) <= one when (signed(dataInArray(0)) <= signed(dataInArray(1)) ) else zero;
-	validArray(0) <= join_valid;
+	array_RAM_fcmp_32ns_32ns_1_2_1_u1 : component array_RAM_fcmp_32cud 
+	generic map (
+				ID => 1,
+				NUM_STAGE => 2,
+				din0_WIDTH => 32,
+				din1_WIDTH => 32,
+				dout_WIDTH => 1)
+	port map (
+			   clk => clk,
+			   reset => rst,
+			   din0 => dataInArray(0),
+			   din1 => dataInArray(1),
+			   ce => oehb_ready,
+			   opcode => alu_opcode,
+			   dout(0) => dataOutArray(0)(0));
+
+	join_write_temp : entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray); 
+
+	oehb: entity work.OEHB(arch) generic map(1, 1, 1, 1)
+	port map(
+		clk => clk,
+		rst => rst,
+		pValidArray(0)  => join_valid,
+		nReadyArray(0)  => nReadyArray(0),
+		validArray(0)   => validArray(0),
+		readyArray(0)   => oehb_ready,
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut);
 
 end architecture;
 
