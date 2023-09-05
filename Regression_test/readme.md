@@ -6,7 +6,7 @@
 
 usage: `bash ./regression_test.sh`
 
---
+---
 
 `run_dhls.sh`: a wrapper script for calling the bins of dynamatic, if you need
 to change the default clock frequency (4 ns), use the following:
@@ -15,14 +15,14 @@ to change the default clock frequency (4 ns), use the following:
 cd ./examples/fir && bash ../../run_dhls.sh -c=6
 ```
 
---
+---
 `filelist.lst`: a list of benchmarks to run regression test on. This file is
 read by `regression_test.sh`.
 ```
 fir
 ```
 
---
+---
 
 View the results:
 ```
