@@ -1,8 +1,6 @@
 #include "complexdiv.h"
-#include <math.h>
 
 #include <stdlib.h>
-
 
 #define AMOUNT_OF_TEST 1
 
@@ -39,7 +37,7 @@ int main(void){
     in_int_t b_r[AMOUNT_OF_TEST][1000];
     out_int_t c_i[AMOUNT_OF_TEST][1000];
     out_int_t c_r[AMOUNT_OF_TEST][1000];
-    
+
     srand(13);
 
     for(int i = 0; i < AMOUNT_OF_TEST; ++i){
@@ -52,9 +50,9 @@ int main(void){
     }
 
 	//for(int i = 0; i < AMOUNT_OF_TEST; ++i){
-    int i = 0; 
+    int i = 0;
     complexdiv(a_i[0], a_r[0], b_i[0], b_r[0], c_i[0], c_r[0]);
 	//}
-	
+
 }
 
