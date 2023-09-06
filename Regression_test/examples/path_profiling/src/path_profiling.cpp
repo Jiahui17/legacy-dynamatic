@@ -1,29 +1,38 @@
 #include "path_profiling.h"
-#include <stdio.h>
 
-void path_profiling(out_int_t a[100], out_int_t b[100]){
-    for (int i = 0; i < 100; ++i){
-       if(i % 2 == 0){
-           a[i] = 2;
-       }else{
-           a[i] = 3;
-       }
-       if(i % 3 == 0){
-           b[i] = 2;
-       }else{
-           b[i] = 3;
-       }
-    }
+#define AMOUNT_OF_TEST 1
+#include <stdlib.h>
+
+void path_profiling(out_int_t a[LOOP_BOUND], out_int_t b[LOOP_BOUND], in_int_t var[LOOP_BOUND]){
+	for (int i = 0; i < LOOP_BOUND; ++i){
+		if(var[i] % 2 == 0){
+			a[i] = 2;
+		}else{
+			a[i] = 3;
+		}
+		if(var[i] % 3 == 0){
+			b[i] = 2;
+		}else{
+			b[i] = 3;
+		}
+	}
 }
 
 //---split-here---
 
-
-#define AMOUNT_OF_TEST 1
-
 int main(void){
-    in_int_t a[100];
-    in_int_t b[100];
-    
-    path_profiling(a, b);
+	out_int_t a[AMOUNT_OF_TEST][LOOP_BOUND];
+	out_int_t b[AMOUNT_OF_TEST][LOOP_BOUND];
+	in_int_t var[AMOUNT_OF_TEST][LOOP_BOUND];
+
+	for(int i = 0; i < AMOUNT_OF_TEST; ++i){
+		for(int j = 0; j < LOOP_BOUND; ++j){
+			a[i][j] = 0;
+			b[i][j] = 0;
+			var[i][j] = rand() % 100;
+		}
+	}
+
+	int iteration = 0;
+	path_profiling(a[iteration], b[iteration], var[iteration]);
 }
