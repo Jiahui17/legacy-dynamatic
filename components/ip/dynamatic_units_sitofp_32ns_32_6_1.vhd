@@ -1,13 +1,13 @@
 -- ==============================================================
--- Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2019.2.1 (64-bit)
+-- Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2019.1.1 (64-bit)
 -- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- ==============================================================
 Library ieee;
 use ieee.std_logic_1164.all;
 
-entity array_RAM_sitofp_bkb is
+entity dynamatic_units_sitofp_32ns_32_6_1 is
     generic (
-        ID         : integer := 1;
+        ID         : integer := 158;
         NUM_STAGE  : integer := 6;
         din0_WIDTH : integer := 32;
         dout_WIDTH : integer := 32
@@ -21,9 +21,9 @@ entity array_RAM_sitofp_bkb is
     );
 end entity;
 
-architecture arch of array_RAM_sitofp_bkb is
+architecture arch of dynamatic_units_sitofp_32ns_32_6_1 is
     --------------------- Component ---------------------
-    component array_RAM_ap_sitofp_4_no_dsp_32 is
+    component dynamatic_units_ap_sitofp_4_no_dsp_32 is
         port (
             aclk                 : in  std_logic;
             aclken               : in  std_logic;
@@ -46,7 +46,7 @@ architecture arch of array_RAM_sitofp_bkb is
     signal dout_r    : std_logic_vector(dout_WIDTH-1 downto 0);
 begin
     --------------------- Instantiation -----------------
-    array_RAM_ap_sitofp_4_no_dsp_32_u : component array_RAM_ap_sitofp_4_no_dsp_32
+    dynamatic_units_ap_sitofp_4_no_dsp_32_u : component dynamatic_units_ap_sitofp_4_no_dsp_32
     port map (
         aclk                 => aclk,
         aclken               => aclken,

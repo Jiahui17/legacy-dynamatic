@@ -4085,7 +4085,7 @@ end entity;
 
 architecture arch of sitofp_op is
 
-	component array_RAM_sitofp_32ns_32_6_1 IS
+	component dynamatic_units_sitofp_32ns_32_6_1 IS
 		generic (
 				  ID : INTEGER;
 				  NUM_STAGE : INTEGER;
@@ -4134,7 +4134,7 @@ begin
 		dataOutArray(0) => oehb_dataOut
 	);
 
-	array_RAM_sitofp_32ns_32_6_1_U1 :  component array_RAM_sitofp_32ns_32_6_1
+	sitofp_ip_core :  component dynamatic_units_sitofp_32ns_32_6_1
 	generic map (
 		ID => 1,
 		NUM_STAGE => LATENCY + 1,
