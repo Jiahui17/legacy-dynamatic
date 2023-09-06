@@ -474,6 +474,11 @@ begin
 	joinValid,
 	readyArray);
 
+	-- sanity check:
+	assert ((not (pValidArray(1) = '1')) or ((condition(0)(0) = '1') or (condition(0)(0) = '0')))
+	report "the circuit somehow produces a valid condition = U or X!!"
+	severity failure;
+
 	br : entity work.branchSimple(arch)
 	port map(   condition(0)(0),
 	joinValid,
