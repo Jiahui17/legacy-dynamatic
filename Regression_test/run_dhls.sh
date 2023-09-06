@@ -36,14 +36,15 @@ DEFAULT_PERIOD=6
 
 # run the elastic pass
 echo "info - Start synthesize."
-compile "${TOP_FILE}" "${PROJ_DIR}"  \
+compile "${TOP_FILE}" "${PROJ_DIR}" 2>&1 \
+	| tee "$PROJ_DIR/reports/elastic_pass.log" \
 	|| fail "error - elastic pass failed!"
 
 # run buffer pass
 echo "info - Start optimize."
 buffers buffers \
 	-filename="${PROJ_DIR}/reports/${PROJ_NAME}" \
-	-period=${CLOCK_PERIOD} -solver=cbc -timeout=360 \
+	-period=${CLOCK_PERIOD} -solver=cbc -timeout=360 2>&1 \
 	| tee "${PROJ_DIR}/reports/buffers.log" \
 	|| fail 'error - buffers failed!'
 
@@ -81,5 +82,8 @@ rm -r "${PROJ_DIR}/sim/HLS_VERIFY/work" 2> /dev/null
 cd "${PROJ_DIR}/sim/HLS_VERIFY"
 
 # run the verifier and save the log
-hlsverifier cover -aw32 "../C_SRC/${TOP_FILE}" "../C_SRC/${TOP_FILE}" "${PROJ_NAME}" \
-	| tee ${PROJ_DIR}/reports/hls_verify.log || fail 'hlsverifier failed!'
+hlsverifier \
+	cover -aw32 "../C_SRC/${TOP_FILE}" \
+	"../C_SRC/${TOP_FILE}" "${PROJ_NAME}" 2>&1 \
+	| tee ${PROJ_DIR}/reports/hls_verify.log \
+	|| fail 'hlsverifier failed!'
