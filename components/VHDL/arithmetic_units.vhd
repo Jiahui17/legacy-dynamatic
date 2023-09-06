@@ -2593,7 +2593,7 @@ end entity;
 architecture arch of sdiv_op is
 
     -- Interface to Vivado component
-	component array_RAM_sdiv_32ns_32ns_32_36_1 is
+	component dynamatic_units_sdiv_32ns_32ns_32_36_1 is
 		generic (
 				  ID : INTEGER;
 				  NUM_STAGE : INTEGER;
@@ -2615,7 +2615,7 @@ architecture arch of sdiv_op is
 	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
 	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 begin 
-	array_RAM_sdiv_32ns_32ns_32_36_1_U1 : component array_RAM_sdiv_32ns_32ns_32_36_1
+	sdiv_ip_core : component dynamatic_units_sdiv_32ns_32ns_32_36_1
 	generic map (
 				ID => 1,
 				NUM_STAGE => LATENCY + 1,
@@ -2625,7 +2625,7 @@ begin
 	port map (
 			   clk => clk,
 			   reset => rst,
-			   ce => nReadyArray(0),
+			   ce => oehb_ready,
 			   din0 => dataInArray(0),
 			   din1 => dataInArray(1),
 			   dout => dataOutArray(0));
