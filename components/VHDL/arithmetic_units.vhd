@@ -2844,7 +2844,7 @@ end entity;
 architecture arch of urem_op is
 
     --Interface to vivado component
-	component array_RAM_urem_32ns_32ns_32_36_1 is
+	component dynamatic_units_urem_32ns_32ns_32_36_1 is
 		generic (
 				  ID : INTEGER;
 				  NUM_STAGE : INTEGER;
@@ -2859,38 +2859,61 @@ architecture arch of urem_op is
 			     din1 : IN STD_LOGIC_VECTOR(din1_WIDTH - 1 DOWNTO 0);
 			     dout : OUT STD_LOGIC_VECTOR(dout_WIDTH - 1 DOWNTO 0));
 	end component;
+
 	signal join_valid : STD_LOGIC;
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
+	signal urem_ip_output : std_logic_vector(32 - 1 downto 0);
+	constant LATENCY : integer := 35;
 
 begin 
+	join: entity work.join(arch) generic map(2)
+	port map(
+		pValidArray => pValidArray,  
+		nReady => oehb_ready,                        
+		valid => join_valid,                  
+		readyArray => readyArray
+	);   
 
-	array_RAM_urem_32ns_32ns_32_36_1_U1 : component array_RAM_urem_32ns_32ns_32_36_1
+	buff: entity work.delay_buffer(arch) generic map(LATENCY - 1)
+	port map(
+	clk => clk,
+	rst => rst,
+	valid_in  => join_valid,
+	ready_in  => oehb_ready,
+	valid_out => buff_valid);
+
+	oehb: entity work.OEHB(arch) generic map (1, 1, 1, 1)
+	port map (
+			  --inputspValidArray
+			   clk => clk, 
+			   rst => rst, 
+			   pValidArray(0)  => buff_valid, -- real or speculatef condition (determined by merge1)
+			   nReadyArray(0) => nReadyArray(0),    
+			   validArray(0) => validArray(0), 
+			  --outputs
+			   readyArray(0) => oehb_ready,   
+			   dataInArray(0) => oehb_datain,
+			   dataOutArray(0) => oehb_dataOut
+		   );
+
+	urem_ip : component dynamatic_units_urem_32ns_32ns_32_36_1
 	generic map (
 				ID => 1,
-				NUM_STAGE => 36,
+				NUM_STAGE => LATENCY + 1,
 				din0_WIDTH => 32,
 				din1_WIDTH => 32,
 				dout_WIDTH => 32)
 	port map (
 			   clk => clk,
 			   reset => rst,
-			   ce => nReadyArray(0),
-			   din0 => dataInArray(0),
-			   din1 => dataInArray(1),
-			   dout => dataOutArray(0));
+			   ce => oehb_ready,
+			   din0 => std_logic_vector(resize(unsigned(dataInArray(0)), 32)),
+			   din1 => std_logic_vector(resize(unsigned(dataInArray(1)), 32)),
+			   dout => urem_ip_output);
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray
-
-	buff: entity work.delay_buffer(arch) 
-	generic map(35)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	dataOutArray(0) <= urem_ip_output(DATA_SIZE_OUT - 1 downto 0);
+	--std_logic_vector(resize(tmp_data_out, OUTPUT_SIZE))
 
 end architecture;
 
