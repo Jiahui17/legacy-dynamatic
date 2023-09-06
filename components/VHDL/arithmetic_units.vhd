@@ -2609,13 +2609,16 @@ architecture arch of sdiv_op is
 			     dout : OUT STD_LOGIC_VECTOR(dout_WIDTH - 1 DOWNTO 0));
 	end component;
 
+	constant LATENCY : integer := 35;
 	signal join_valid : STD_LOGIC;
 
+	signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
+	signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 begin 
 	array_RAM_sdiv_32ns_32ns_32_36_1_U1 : component array_RAM_sdiv_32ns_32ns_32_36_1
 	generic map (
 				ID => 1,
-				NUM_STAGE => 36,
+				NUM_STAGE => LATENCY + 1,
 				din0_WIDTH => 32,
 				din1_WIDTH => 32,
 				dout_WIDTH => 32)
@@ -2627,19 +2630,25 @@ begin
 			   din1 => dataInArray(1),
 			   dout => dataOutArray(0));
 
-	join_write_temp:   entity work.join(arch) generic map(2)
-	port map( pValidArray,  --pValidArray
-	nReadyArray(0),     --nready                    
-	join_valid,         --valid          
-	readyArray);   --readyarray
+	join: entity work.join(arch) generic map(2)
+	port map( pValidArray, oehb_ready, join_valid, readyArray);   
 
-	buff: entity work.delay_buffer(arch) 
-	generic map(35)
-	port map(clk,
-	rst,
-	join_valid,
-	nReadyArray(0),
-	validArray(0));
+	buff: entity work.delay_buffer(arch) generic map(LATENCY - 1)
+	port map(clk, rst, join_valid, oehb_ready, buff_valid);
+
+	oehb: entity work.OEHB(arch) generic map (1, 1, 1, 1)
+	port map (
+			  --inputspValidArray
+			   clk => clk, 
+			   rst => rst, 
+			   pValidArray(0)  => buff_valid, -- real or speculatef condition (determined by merge1)
+			   nReadyArray(0) => nReadyArray(0),    
+			   validArray(0) => validArray(0), 
+			  --outputs
+			   readyArray(0) => oehb_ready,   
+			   dataInArray(0) => oehb_datain,
+			   dataOutArray(0) => oehb_dataOut
+		   );
 
 end architecture;
 
@@ -4090,29 +4099,53 @@ architecture arch of sitofp_op is
 			     dout : OUT STD_LOGIC_VECTOR (31 downto 0) );
 	end component;
 
+
+	constant LATENCY : integer := 5;
+
+	signal oehb_datain : std_logic_vector (0 downto 0) := (others => '0');
+	signal buff_valid, oehb_valid, oehb_ready : std_logic := '0';
+	signal oehb_dataOut : std_logic_vector(0 downto 0) := (others => '0');
+
 begin 
 
 	buff: entity work.delay_buffer(arch) 
-	generic map(5)
-	port map(clk,
-	rst,
-	pValidArray(0),
-	nReadyArray(0),
-	validArray(0));
+	generic map (
+		SIZE => LATENCY - 1
+	)
+	port map(
+		clk => clk,
+		rst => rst,
+		valid_in  => pValidArray(0),
+		ready_in  => oehb_ready,
+		valid_out => buff_valid
+	);
+
+	oehb: entity work.OEHB(arch) generic map (1, 1, 1, 1)
+	port map (
+		--inputs
+		clk => clk, 
+		rst => rst, 
+		pValidArray(0)  => buff_valid, 
+		nReadyArray(0)  => nReadyArray(0),    
+		validArray(0)   => validArray(0), 
+		--outputs
+		readyArray(0)   => oehb_ready,   
+		dataInArray(0)  => oehb_datain,
+		dataOutArray(0) => oehb_dataOut
+	);
 
 	array_RAM_sitofp_32ns_32_6_1_U1 :  component array_RAM_sitofp_32ns_32_6_1
 	generic map (
-				ID => 1,
-				NUM_STAGE => 6,
-				din0_WIDTH => 32,
-				dout_WIDTH => 32)
+		ID => 1,
+		NUM_STAGE => LATENCY + 1,
+		din0_WIDTH => 32,
+		dout_WIDTH => 32)
 	port map (
-			   clk   => clk,
-			   reset => rst,
-			   din0  => dataInArray(0),
-			   ce    => nReadyArray(0),
-			   dout  => dataOutArray(0));
+		 clk   => clk,
+		 reset => rst,
+		 din0  => dataInArray(0),
+		 ce    => oehb_ready,
+		 dout  => dataOutArray(0));
 
-	readyArray(0) <= nReadyArray(0);
-
+	readyArray(0) <= oehb_ready;
 end architecture;
