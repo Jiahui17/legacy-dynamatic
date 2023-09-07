@@ -32,3 +32,11 @@ bash ./report_results.sh
 # ./examples/fir/reports/hls_verify.log:Comparison of [end] : Pass
 ```
 
+## Running Synthesis using Vivado (v2019.1.1)
+
+The script `run_vivado201911.py` writes the needed tcl scripts for Vivado, and
+it runs the synthesis.
+
+```sh 
+cd ./examples/fir && python3 ../../../bin/run_vivado201911.py -clock=6
+```
