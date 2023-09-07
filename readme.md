@@ -1,4 +1,4 @@
-# The Dynamatic HLS Compiler (A fork for formal verification)
+# The Dynamatic HLS Compiler
 
 For official repository please checkout https://github.com/lana555/dynamatic
 
@@ -19,7 +19,10 @@ cd boost_1_82_0
 sudo ./b2 install
 ```
 
-Build LLVM (version 6.0):
+Build LLVM (version 6.0), note that this will install llvm in
+`/usr/local/llvm-6.0`, this location is hardcoded in the `build.sh` script,
+remember to change it when you need to install LLVM in a different location:
+
 ```sh
 git clone http://github.com/llvm-mirror/llvm --branch release_60 --depth 1
 cd llvm/tools
