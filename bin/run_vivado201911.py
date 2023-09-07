@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+from glob import glob
+from argparse import ArgumentParser
+import re, sys, subprocess
+
+# where is the root for the entire project?
+_DHLS_ROOT = Path(__file__).resolve().parents[2]
+
+_TCL_DIR = _DHLS_ROOT / 'etc' / 'dynamatic' / 'components' / 'tcl'
+
+def get_arguments():
+
+	proj_name = basename(glob('./src/*.cpp')[0]).replace('.cpp', '')
+
+	parser = ArgumentParser()
+	parser.add_argument('-name', type=str, default = proj_name)
+	parser.add_argument('-clock', type=int, default = 6)
+	return parser.parse_args()
+
+def run(*args, **kwargs):
+	sys.stdout.flush()
+	return subprocess.run(*args,**kwargs,check=True) 
+
+
+if __name__ == '__main__':
+
+	# check if the directory is ready for synthesis
+	if glob('./src') == []:
+		raise ValueError('./src directory missing!')
+
+	if glob('./hdl') == []:
+		raise ValueError('./hdl directory missing!')
+
+	args = get_arguments()
+
+	for tcl in glob(_TCL_DIR / '*.tcl'):
+		run(['cp', tcl , './hdl'])
+	
+	float_clock = '{:3f}'.format(float(args.clock))
+	float_half_clock = '{:3f}'.format(float(args.clock) / 2)
+
+	# write xdc file
+	with open('./period.xdc', 'w') as f:
+		text = '''
+create_clock -name clk -period ?CLOCK? -waveform {0.000 ?HALF_CLOCK?} [get_ports clk]
+set_property HD.CLK_SRC BUFGCTRL_X0Y0 [get_ports clk]
+		'''
+
+		text = re.sub(r'\?CLOCK\?', float_clock, text)
+		text = re.sub(r'\?HALF_CLOCK\?', float_half_clock, text)
+
+	# write the synthesis file
+	with open('./synthesis.tcl', 'w') as f:
+		for tcl in glob('./hdl/*.tcl'):
+			f.write(f'source {tcl}\n')
+
+		for vhdl in glob('./hdl/*.vhd'):
+			f.write(f'read_vhdl -vhdl2008 {vhdl}\n')
+
+		for verilog in glob('./hdl/*.v'):
+			f.write(f'read_verilog {verilog}\n')
+		text = '''
+read_xdc period.xdc
+
+source include_float.tcl
+
+synth_design -top TOP_DESIGN -part xc7k160tfbg484-1 -no_iobuf -mode out_of_context
+
+opt_design
+place_design
+route_design
+report_utilization -hierarchical > synth_rpts/utilization_post_pr_hierarchical.rpt
+report_utilization > synth_rpts/utilization_post_pr.rpt
+report_timing > synth_rpts/timing_post_pr.rpt
+
+# Uncomment the line below to save the design checkpoint to file
+#write_checkpoint -force checkpoint_post_pr.dcp
+
+exit
+		'''
+		text = re.sub('TOP_DESIGN', args.name, text)
+		f.write(text)
+
+		sys.stdout.flush()
+		subprocess.run(['vivado-2019.1.1', 'vivado',
+			'-mode', 'batch', '-source', './synthesis.tcl'], check=True)
+
+	run(['vivado-2019.1.1', 'vivado', '-mode', 'batch', '-source', './synthesis.tcl'])
