@@ -46,4 +46,38 @@ cd $INSTALL_DIR/Dynamatic/etc/dynamatic && bash build.sh
 
 ## Regression Test
 
-Please refer to `./Regression_test/readme.md`
+Dynamatic provides a comprehensive regression test. Please refer to `./Regression_test/readme.md`
+
+
+## Project Map
+
+`elastic-circuits`: A collection of LLVM passes which input a C/C++ program and
+transform its IR into a dataflow circuit. The output of this pass is a .DOT
+file which represents a netlist of dataflow components. 
+
+`Buffers`: Buffer placement for throughput and critical path optimization.
+Inputs the .DOT netlist from *elastic-circuits* and outputs a .DOT netlist with
+buffers placed and sized to maximize throughput under a given clock period
+constaint.
+
+`dot2vhdl/dothdl`: Inputs a .DOT netlist (either produced by
+*elastic-circuits*, or by *Buffers*) and outputs an equivalent VHDL netlist of
+dataflow components. VHDL descriptions of the dataflow components are given in
+*components*. Apart from the VHDL netlist, *dot2vhdl* also produces a .json
+file for configuring LSQs (if required by the design). The LSQ can be
+configured using the files in *chisel_lsq*.
+
+`bin`: it contains wrapper scripts for the compilation flow.
+
+`data`: dataflow unit characterization (delay, latency) used by *Buffers*.
+
+`Regression_test`: for testing purpose, `Regression_test/examples` contains a
+suite of benchmarks used to evaluate dynamic scheduling.
+
+`components`: VHDL/Verilog implementation of the dataflow units, wrapper
+modules for interfacing with Xilinx floating point IPs.
+
+`chisel_lsq`: LSQ generator written in *chisel*.
+
+`build.sh`: a push-button solution for building Dynamatic.
+
