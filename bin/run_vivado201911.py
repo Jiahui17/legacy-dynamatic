@@ -35,13 +35,11 @@ if __name__ == '__main__':
 
 	args = get_arguments()
 
-	print((str(_TCL_DIR / '*.tcl')))
-	print(glob(str(_TCL_DIR / '*.tcl')))
 	for tcl in glob(str(_TCL_DIR / '*.tcl')):
 		run(['cp', tcl , './hdl'])
 	
-	float_clock = '{:3f}'.format(float(args.clock))
-	float_half_clock = '{:3f}'.format(float(args.clock) / 2)
+	float_clock = f'{float(args.clock):.3f}'
+	float_half_clock = f'{float(args.clock) / 2:.3f}'
 
 	# write xdc file
 	with open('./period.xdc', 'w') as f:
