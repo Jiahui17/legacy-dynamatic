@@ -19,7 +19,7 @@ mkdir -p $1/$HDL_DIR
 mv $1/reports/*.{vhd,v,tcl} $1/$HDL_DIR
 
 cp $DHLS_INSTALL_DIR/etc/dynamatic/components/VHDL/*.{vhd,v,tcl} $1/$HDL_DIR
-cp $DHLS_INSTALL_DIR/etc/dynamatic/components/ip/*.{vhd,v,tcl} $1/$HDL_DIR
+cp $DHLS_INSTALL_DIR/etc/dynamatic/components/ip_vhdl/*.{vhd,v,tcl} $1/$HDL_DIR
 
 
 mv -f *.v $1/$HDL_DIR > /dev/null 2>&1
