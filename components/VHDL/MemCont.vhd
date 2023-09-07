@@ -108,7 +108,7 @@ entity read_data_signals is
 		sel	 : in  std_logic_vector(ARBITER_SIZE - 1 downto 0);
 		read_data : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
 		out_data  : out data_array(ARBITER_SIZE - 1 downto 0)(DATA_WIDTH - 1 downto 0);
-		valid	: out std_logic_vector(ARBITER_SIZE - 1 downto 0);
+		valid	: out std_logic_vector(ARBITER_SIZE - 1 downto 0) := (others => '0');
 		nReady	: in  std_logic_vector(ARBITER_SIZE - 1 downto 0)
 	);
 end entity;
@@ -144,13 +144,20 @@ begin
 		end if;
 	end process;
 
+	g_sanity_checker : for I in 0 to ARBITER_SIZE - 1 generate
+		assert ( (not full(I)) or (not sel_prev(I)) )
+		report "By construction, when the cell is full, the memory access should not be granted!"
+		severity failure;
+
+		assert ( valid(I) = ( full(I) or sel_prev(I) ) )
+		report "valid must be equivalent to (full or sel_prev)."
+		severity failure;
+	end generate;
+
 
 	process(clk, rst) is
 	begin
 		for I in 0 to ARBITER_SIZE - 1 loop
-			assert ( (not full(I)) or (not sel_prev(I)) )
-				report "By construction, when the cell is full, the memory access should not be granted!"
-				severity failure;
 			if (rst) then
 				full(I) <= '0';
 			elsif (rising_edge(clk)) then
