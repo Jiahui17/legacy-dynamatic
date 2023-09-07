@@ -91,4 +91,5 @@ if __name__ == '__main__':
 		f.write(re.sub(r'\t+','', text))
 
 	
+	run(['mkdir', '-p', './synth_rpts'])
 	run(['vivado-2019.1.1', 'vivado', '-mode', 'batch', '-source', './synthesis.tcl'])
