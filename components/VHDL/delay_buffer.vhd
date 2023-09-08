@@ -155,5 +155,6 @@ begin
 	readyArray(0) <= ready_internal;
 
 	valid_internal <= b_counter_zero and full_reg;
+	dataOutArray(0) <= data_reg;
 
 end arch;
