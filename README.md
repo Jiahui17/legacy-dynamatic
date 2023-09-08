@@ -6,14 +6,14 @@ For official repository please checkout https://github.com/lana555/dynamatic
 
 Install dependencies:
 ```sh
+# install the required packages in one line
 sudo apt-get install -y build-essential \
 	g++ cmake git pkg-config \
-	coinor-cbc \
-	graphviz graphviz-dev \
-	xdot libxdot4 python3.8*
+	coinor-cbc graphviz graphviz-dev
 
 # install boost library
 wget https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.gz
+tar -xf boost_1_82_0.tar.gz
 cd boost_1_82_0
 ./bootstrap.sh
 sudo ./b2 install
