@@ -22,17 +22,17 @@ echo "Andrea: arg1: " $1 "arg2:" $2 "arg3" $3 "arg4" $4
 fast_token=$4
 
 if [ -z "$4" ]
-  then
-     fast_token=$3
+then
+	fast_token=$3
 fi
 
 
 if [ $fast_token = "-fast-token=true" ] ; then
-  echo "fast-token mode activated"
-  PASS_DIR="/home/dynamatic/Dynamatic/etc/dynamatic/elastic-circuits-fast-token"
+	echo "fast-token mode activated"
+	PASS_DIR="/home/dynamatic/Dynamatic/etc/dynamatic/elastic-circuits-fast-token"
 else
-  #$4 =" "
-  flag2=$4
+	#$4 =" "
+	flag2=$4
 fi
 
 BUILDDIR=$2
@@ -62,12 +62,12 @@ echo "$CLANG -emit-llvm -S $OPTIMIZATION_LEVEL $OPTIMIZATION_FLAGS -c $SRC_DIR/$
 #LLVM 6.0
 
 {
-$CLANG -Xclang -disable-O0-optnone -emit-llvm -S $OPTIMIZATION_LEVEL $OPTIMIZATION_FLAGS -c $SRC_DIR/$name -o .$name.ll
-$OPT -mem2reg .$name.ll -S -o .$name"_mem2reg.ll"
-$OPT -loop-rotate -constprop  .$name"_mem2reg.ll" -S -o .$name"_mem2reg_constprop.ll"
-#$(OPT) -constprop  $(BUILDDIR)/$(name)_mem2reg.ll -S -o $(BUILDDIR)/$(name)_mem2reg_constprop.ll
-$OPT -simplifycfg .$name"_mem2reg_constprop.ll" -S -o .$name"_mem2reg_constprop_simplifycfg.ll"
-$OPT -die -instcombine -lowerswitch .$name"_mem2reg_constprop_simplifycfg.ll" -S -o .$name"_mem2reg_constprop_simplifycfg_die.ll"
+	$CLANG -Xclang -disable-O0-optnone -emit-llvm -S $OPTIMIZATION_LEVEL $OPTIMIZATION_FLAGS -c $SRC_DIR/$name -o .$name.ll
+	$OPT -mem2reg .$name.ll -S -o .$name"_mem2reg.ll"
+	$OPT -loop-rotate -constprop  .$name"_mem2reg.ll" -S -o .$name"_mem2reg_constprop.ll"
+	#$(OPT) -constprop  $(BUILDDIR)/$(name)_mem2reg.ll -S -o $(BUILDDIR)/$(name)_mem2reg_constprop.ll
+	$OPT -simplifycfg .$name"_mem2reg_constprop.ll" -S -o .$name"_mem2reg_constprop_simplifycfg.ll"
+	$OPT -die -instcombine -lowerswitch .$name"_mem2reg_constprop_simplifycfg.ll" -S -o .$name"_mem2reg_constprop_simplifycfg_die.ll"
 } || fail 'Clang frontend failed!'
 #Abdullah: Added -lowerswitch flag to handle switch to branch conversion.
 
@@ -81,12 +81,12 @@ $CLANG -Xclang -load -Xclang $PASS_DIR/_build/FrequencyDataGatherPass/libFrequen
 rm *.s
 
 $OPT \
--load $PASS_DIR/_build/MemElemInfo/libLLVMMemElemInfo.so \
--load $PASS_DIR/_build/ElasticPass/libElasticPass.so \
--load $PASS_DIR/_build/OptimizeBitwidth/libLLVMOptimizeBitWidth.so \
--load $PASS_DIR/_build/MyCFGPass/libMyCFGPass.so \
--polly-process-unprofitable -mycfgpass .$name"_mem2reg_constprop_simplifycfg_die.ll" -S \
-$3 $flag2
+	-load $PASS_DIR/_build/MemElemInfo/libLLVMMemElemInfo.so \
+	-load $PASS_DIR/_build/ElasticPass/libElasticPass.so \
+	-load $PASS_DIR/_build/OptimizeBitwidth/libLLVMOptimizeBitWidth.so \
+	-load $PASS_DIR/_build/MyCFGPass/libMyCFGPass.so \
+	-polly-process-unprofitable -mycfgpass .$name"_mem2reg_constprop_simplifycfg_die.ll" -S \
+	$3 $flag2
 
 mv out.txt $REPORT_DIR/.$name"_new.txt" > /dev/null 2>&1
 mv print.txt $REPORT_DIR/.$name"_print.txt" > /dev/null 2>&1
@@ -104,11 +104,3 @@ func_name=$(echo "$name" | cut -f 1 -d '.')
 mv *_bbgraph.dot $REPORT_DIR/$func_name"_bbgraph.dot"
 mv *.dot $REPORT_DIR/$func_name".dot"
 mv *.txt $DEBUG_DIR/
-
-dot -Tpng $REPORT_DIR/$func_name"_bbgraph.dot" > $REPORT_DIR/$func_name"_bbgraph.png"
-dot -Tpng $REPORT_DIR/$func_name".dot" > $REPORT_DIR/$func_name".png"
-
-
-
-
-
