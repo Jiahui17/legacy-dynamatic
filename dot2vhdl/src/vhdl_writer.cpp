@@ -57,7 +57,8 @@ string entity_name[] = {
 	ENTITY_MC,
 	ENTITY_DISTRIBUTOR,
 	ENTITY_INJECTOR,
-	ENTITY_SELECTOR
+	ENTITY_SELECTOR,
+	ENTITY_DELAYER  // Jiahui 08.09.2023: new unit for latency balancing
 };
 
 string component_types[] = {
@@ -1142,12 +1143,16 @@ string get_component_entity ( string component, int component_id )
 
 	for (int indx = 0; indx < ENTITY_MAX; indx++)
 	{
-		//cout  << "component_id" << component_id << "component "<< component << " " << component_types[indx] << endl;
 		if ( component.compare(component_types[indx]) == 0 )
 		{
 			component_entity =  entity_name[indx];
 			break;
 		}
+	}
+
+	if (component_entity.size() == 0) {
+		cerr << "Cannot determine the type of the unit "<< component <<", aborting!" << endl;
+		abort();
 	}
 
 
