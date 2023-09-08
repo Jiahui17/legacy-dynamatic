@@ -15,7 +15,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <algorithm> 
+#include <algorithm>
 #include <list>
 #include <cctype>
 #include "assert.h"
@@ -38,7 +38,7 @@ int lsqs_in_netlist;
 
 bool check_line ( string line )
 {
-    
+
     if ( line.find("type") != std::string::npos )
     {
         return COMPONENT_DESCRIPTION_LINE;
@@ -57,17 +57,17 @@ string get_value ( string parameter )
     {
         return v[1];
     }
-    
+
 }
 
 string get_component_type ( string parameters )
 {
 
     parameters = string_clean( parameters );
-    
+
     string type = get_value ( parameters );
     nodes[components_in_netlist].component_type = COMPONENT_GENERIC;
-    
+
     return type;
 }
 
@@ -76,14 +76,14 @@ string get_component_operator ( string parameters )
     parameters = string_clean( parameters );
 
     string type = get_value ( parameters );
-  
+
     return type;
 }
 
 string get_component_value ( string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return type;
 }
@@ -91,18 +91,18 @@ string get_component_value ( string parameters )
 bool get_component_control (  string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
-        
+
     return ((( type == "true" )) ? TRUE : FALSE);
 }
 
 
 int get_component_slots ( string parameters )
 {
-    
+
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return stoi_p( type );
 }
@@ -111,9 +111,9 @@ int get_component_slots ( string parameters )
 bool get_component_transparent (  string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
-    
+
     return ((( type == "true" )) ? TRUE : FALSE);
 }
 
@@ -147,7 +147,7 @@ string get_component_numstores ( string parameters )
 int get_component_bbcount ( string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return stoi_p( type );
 }
@@ -155,7 +155,7 @@ int get_component_bbcount ( string parameters )
 int get_component_bbId ( string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return stoi_p( type );
 }
@@ -164,7 +164,7 @@ int get_component_bbId ( string parameters )
 int get_component_portId ( string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return stoi_p( type );
 }
@@ -172,7 +172,7 @@ int get_component_portId ( string parameters )
 int get_component_offset ( string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return stoi_p( type );
 }
@@ -180,9 +180,9 @@ int get_component_offset ( string parameters )
 bool get_component_mem_address (  string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
-           
+
     return ((( type == "true" )) ? TRUE : FALSE);
 
 }
@@ -190,7 +190,7 @@ bool get_component_mem_address (  string parameters )
 int get_component_constants ( string parameters )
 {
     parameters = string_clean( parameters );
-        
+
     string type = get_value ( parameters );
     return stoi_p( type );
 }
@@ -198,7 +198,7 @@ int get_component_constants ( string parameters )
 vector<vector<int>> get_component_orderings(string parameter){
     vector<vector<int>> orderings;
     vector<string> par = vector<string>();
-    string_split( parameter, '=', par ); 
+    string_split( parameter, '=', par );
     assert(par.size() == 2);
     par[1].erase( remove( par[1].begin(), par[1].end(), '"' ), par[1].end() );
     string value = par[1];
@@ -206,7 +206,7 @@ vector<vector<int>> get_component_orderings(string parameter){
     int start_index = value.find_first_not_of(" ");
     int end_index = value.find_last_not_of(" ") + 1;
     value = value.substr(start_index, end_index);
-    
+
     vector<string> ordering_per_bb = vector<string>();
     if(value.find(" ") != string::npos){
         string_split(value, ' ', ordering_per_bb);
@@ -234,16 +234,16 @@ string get_input_type ( string in )
 {
     vector<string> par;
     string ret_val = "u";
-    
+
     string_split( in, '*', par );
-    
+
     if ( par.size() )
     {
         par[1].erase( remove( par[1].begin(), par[1].end(), '"' ), par[1].end() );
         ret_val = par[1].at(0);
     }
-    
-    
+
+
     return ret_val;
 }
 
@@ -252,10 +252,10 @@ int get_input_port ( string in )
     vector<string> par;
     int ret_val = 0;
     string val;
-    
+
     string_split( in, '*', par );
-    
-    
+
+
     if ( par.size() )
     {
         par[1].erase( remove( par[1].begin(), par[1].end(), '"' ), par[1].end() );
@@ -265,7 +265,7 @@ int get_input_port ( string in )
             ret_val =  stoi_p ( val );
         }
     }
-    
+
     //cout << in << ":" << ret_val << endl;
 
     return ret_val;
@@ -278,7 +278,7 @@ string get_info_type ( string in )
     string ret_val = "u";
 
     string_split( in, '*', par );
-    
+
     if ( par.size() )
     {
         par[1].erase( remove( par[1].begin(), par[1].end(), '"' ), par[1].end() );
@@ -287,37 +287,37 @@ string get_info_type ( string in )
             ret_val = par[1].at(2);
         }
     }
-    
-    
+
+
     return ret_val;
 }
 
 
 int get_input_size ( string in )
 {
-    
+
     vector<string> bit_sizes;
     int ret_val = 32;
-    
+
     string_split( in, ':', bit_sizes );
-    
+
     if ( bit_sizes.size() )
     {
         bit_sizes[1].erase( remove( bit_sizes[1].begin(), bit_sizes[1].end(), '"' ), bit_sizes[1].end() );
         bit_sizes[1].erase( remove( bit_sizes[1].begin(), bit_sizes[1].end(), ']' ), bit_sizes[1].end() );
         bit_sizes[1].erase( remove( bit_sizes[1].begin(), bit_sizes[1].end(), ';' ), bit_sizes[1].end() );
 
-        if ( stoi_p( bit_sizes[1] ) == 0 ) // if 0 force to 1!! 
+        if ( stoi_p( bit_sizes[1] ) == 0 ) // if 0 force to 1!!
         {
-            ret_val = 1; 
+            ret_val = 1;
         }
         else
         {
             ret_val = stoi_p( bit_sizes[1] );
-        }                        
+        }
 
     }
-    
+
     return ret_val;
 
 }
@@ -330,17 +330,17 @@ IN_T get_component_inputs ( string in , int components_in_netlist )
     IN_T inputs;
 
     in.erase( remove( in.begin(), in.end(), '\t' ), in.end() );
-        
+
     inputs.size = 0;
-    
-    string_split( in, '=', par ); 
-    
+
+    string_split( in, '=', par );
+
     if ( par.size() )
     {
         par[1].erase( remove( par[1].begin(), par[1].end(), '"' ), par[1].end() );
 
     }
-    
+
     string test_string;
 
     for ( int indx = MAX_INPUTS ; indx > 0; indx-- )
@@ -352,7 +352,7 @@ IN_T get_component_inputs ( string in , int components_in_netlist )
             inputs.size = indx;
             break;
         }
-            
+
     }
 
     int input_indx = 0;
@@ -360,11 +360,11 @@ IN_T get_component_inputs ( string in , int components_in_netlist )
     if ( inputs.size == 1 )
     {
         inputs.input[input_indx].bit_size = get_input_size ( par[1] );
-        
-        
+
+
         inputs.input[input_indx].type = get_input_type ( par[1] );
         inputs.input[input_indx].port = get_input_port ( par[1] );
-        inputs.input[input_indx].info_type = get_info_type ( par[1] ); 
+        inputs.input[input_indx].info_type = get_info_type ( par[1] );
         if ( inputs.input[input_indx].info_type == "a" )
         {
             nodes[components_in_netlist].address_size =  inputs.input[input_indx].bit_size;
@@ -373,13 +373,13 @@ IN_T get_component_inputs ( string in , int components_in_netlist )
         {
             nodes[components_in_netlist].data_size =  inputs.input[input_indx].bit_size;
         }
-        
-        
+
+
     }
     else
     {
         string_split( par[1], ' ', v );
-        
+
         if ( v.size() )
         {
             for ( int indx = 0; indx <  v.size(); indx++ )
@@ -389,7 +389,7 @@ IN_T get_component_inputs ( string in , int components_in_netlist )
                         inputs.input[input_indx].bit_size = get_input_size ( v[indx] );
                         inputs.input[input_indx].type = get_input_type ( v[indx] );
                         inputs.input[input_indx].port = get_input_port ( v[indx] );
-                        inputs.input[input_indx].info_type = get_info_type ( v[indx] ); 
+                        inputs.input[input_indx].info_type = get_info_type ( v[indx] );
                         if ( inputs.input[input_indx].info_type == "a" )
                         {
                            nodes[components_in_netlist].address_size =  inputs.input[input_indx].bit_size;
@@ -398,15 +398,15 @@ IN_T get_component_inputs ( string in , int components_in_netlist )
                         {
                            nodes[components_in_netlist].data_size =  inputs.input[input_indx].bit_size;
                         }
-                        
+
                         //cout << nodes[components_in_netlist].name << " input "<< input_indx << ":" << inputs.input[input_indx].type << endl;
                         input_indx++;
-                        
+
                     }
             }
         }
     }
-    
+
     return inputs;
 
 }
@@ -418,20 +418,20 @@ OUT_T get_component_outputs ( string parameters )
     vector<string> par;
 
     OUT_T outputs;
-    
+
     outputs.size = 0;
 
-    string_split( parameters, '=', par ); 
-    
+    string_split( parameters, '=', par );
+
     if ( par.size() )
     {
         par[1].erase( remove( par[1].begin(), par[1].end(), '"' ), par[1].end() );
 
     }
-    
+
     string test_string;
 
-    
+
     for ( int indx = MAX_OUTPUTS ; indx > 0; indx-- )
     {
         test_string = "out";
@@ -441,11 +441,11 @@ OUT_T get_component_outputs ( string parameters )
             outputs.size = indx;
             break;
         }
-            
+
     }
 
     int output_indx = 0;
-    
+
     if ( outputs.size == 1 )
     {
         outputs.output[output_indx].bit_size = get_input_size ( par[1] );
@@ -471,24 +471,24 @@ OUT_T get_component_outputs ( string parameters )
             }
         }
     }
-            
+
     return outputs;
 }
 
 string get_component_name ( string name )
 {
     string name_ret;
-    name.erase( remove( name.begin(), name.end(), '\t' ), name.end() );    
+    name.erase( remove( name.begin(), name.end(), '\t' ), name.end() );
     name.erase( remove( name.begin(), name.end(), '"' ), name.end() );
     name.erase( remove( name.begin(), name.end(), ' ' ), name.end() );
-    
+
     if ( name[0] == '_' )
     {
         //cout << "***WARNING***: Vivado doesn't support names with '_' as first character. Component "<< name <<" renamed as ";
         name.replace(0,1,"");
         //cout << name << endl;
     }
-        
+
     name_ret = name;
     return name_ret;
 
@@ -496,15 +496,15 @@ string get_component_name ( string name )
 
 void parse_connections ( string line )
 {
-    
+
     vector<string> v;
     vector<string> from_to;
     vector<string> parameters;
-    
-    
+
+
     int current_node_id;
     int next_node_id;
-    
+
     string_split(line, '>', v);
 
     int i;
@@ -514,7 +514,7 @@ void parse_connections ( string line )
         v[0].erase( remove( v[0].begin(), v[0].end(), '-' ), v[0].end() );
         v[0].erase( remove( v[0].begin(), v[0].end(), '\t' ), v[0].end() );
         v[0].erase( remove( v[0].begin(), v[0].end(), '"' ), v[0].end() );
-        
+
         string_split( v[1], '[', from_to );
         from_to[0].erase( remove( from_to[0].begin(), from_to[0].end(), ' ' ), from_to[0].end() );
         from_to[0].erase( remove( from_to[0].begin(), from_to[0].end(), '\t' ), from_to[0].end() );
@@ -529,10 +529,10 @@ void parse_connections ( string line )
         {
             from_to[0].replace(0,1,"");
         }
-        
-        
+
+
         current_node_id = COMPONENT_NOT_FOUND;
-        for (i = 0; i < components_in_netlist; i++) 
+        for (i = 0; i < components_in_netlist; i++)
         {
             if ( nodes[i].name.compare(v[0]) == 0 )
             {
@@ -541,8 +541,8 @@ void parse_connections ( string line )
             }
         }
         next_node_id = COMPONENT_NOT_FOUND;
-        
-        for (i = 0; i < components_in_netlist; i++) 
+
+        for (i = 0; i < components_in_netlist; i++)
         {
             if ( nodes[i].name.compare(from_to[0]) == 0 )
             {
@@ -552,7 +552,7 @@ void parse_connections ( string line )
         }
 
         string_split( from_to[1], ',', parameters );
-        
+
         int input_indx;
         int output_indx;
         int indx;
@@ -574,23 +574,23 @@ void parse_connections ( string line )
                     parameters[indx].erase( remove( parameters[indx].begin(), parameters[indx].end(), '"' ), parameters[indx].end() );
                     parameters[indx].erase( remove( parameters[indx].begin(), parameters[indx].end(), ';' ), parameters[indx].end() );
                     parameters[indx].erase( remove( parameters[indx].begin(), parameters[indx].end(), ']' ), parameters[indx].end() );
-                    
-                    
+
+
                     parameters[indx].erase(0, 5);
-                    
+
                     input_indx = stoi_p( parameters[indx] );
                     input_indx--;
                 }
-                
+
             }
-        
+
         if ( current_node_id != COMPONENT_NOT_FOUND && next_node_id != COMPONENT_NOT_FOUND )
         {
-            
+
             nodes[current_node_id].outputs.output[output_indx].next_nodes_id = next_node_id;
             nodes[current_node_id].outputs.output[output_indx].next_nodes_port = input_indx;
             nodes[next_node_id].inputs.input[input_indx].prev_nodes_id = current_node_id;
-            
+
         }
         else
         {
@@ -601,18 +601,18 @@ void parse_connections ( string line )
                     cout << "Node Description "<< v[0] << " not found. Not ID assigned" << endl;
             }
             else
-                
+
             if ( next_node_id == COMPONENT_NOT_FOUND )
             {
                     cout << "Node ID" << current_node_id << "Node Name: " << nodes[current_node_id].name << " has not next node for output " << output_indx << endl;
             }
-                
+
             cout << "Exiting without producing netlist" << endl;
             exit ( 0);
 
         }
-            
-    }    
+
+    }
 }
 
 
@@ -620,7 +620,7 @@ string check_comments ( string line  )
 {
     vector<string> v;
     string_split(line, COMMENT_CHARACTER, v);
-    
+
     if ( v.size() > 0 )
         return  v[0];
     else
@@ -636,14 +636,14 @@ void parse_components ( string v_0, string v_1 )
     nodes[components_in_netlist].name = get_component_name ( v_0 );
     if ( !( nodes[components_in_netlist].name.empty() ) ) //Check if the name is not empty
     {
-        
+
         string_split( v_1, ',', parameters );
-        
+
         int indx;
         for ( indx = 0; indx < parameters.size(); indx++ )
         {
             parameter = string_remove_blank ( parameters[indx] );
-            
+
             if ( parameter.find("type") != std::string::npos )
             {
                 nodes[components_in_netlist].type = get_component_type ( parameters[indx] );
@@ -661,7 +661,7 @@ void parse_components ( string v_0, string v_1 )
             }
             if ( parameter.find("out=") != std::string::npos )
             {
-                //cout << " nodes " << nodes[components_in_netlist].name << endl;                
+                //cout << " nodes " << nodes[components_in_netlist].name << endl;
                 nodes[components_in_netlist].outputs = get_component_outputs(parameters[indx]);
             }
             if ( parameter.find("op") != std::string::npos )
@@ -684,7 +684,7 @@ void parse_components ( string v_0, string v_1 )
                 nodes[components_in_netlist].slots = get_component_slots( parameters[indx] );
 
                 //cout << "nodes[components_in_netlist].slots" << nodes[components_in_netlist].slots;
-                
+
                 switch ( nodes[components_in_netlist].slots )
                 {
                     case 1: //if slots = 1
@@ -697,7 +697,7 @@ void parse_components ( string v_0, string v_1 )
 //                                 {
 //                                     // if transparent = false -> put OEHB
 //                                     nodes[components_in_netlist].type = "OEHB";
-// 
+//
 //                                 }
 //                                 break;
                     case 2: //put elasticBuffer (ignore transparent parameter)
@@ -706,7 +706,7 @@ void parse_components ( string v_0, string v_1 )
                         break;
                     default: // > 2
                         nodes[components_in_netlist].type = "Fifo";
-                        nodes[components_in_netlist].component_operator = nodes[components_in_netlist].type; // For the component without an operator, sets the entity type                               
+                        nodes[components_in_netlist].component_operator = nodes[components_in_netlist].type; // For the component without an operator, sets the entity type
                         break;
                 }
 
@@ -722,10 +722,10 @@ void parse_components ( string v_0, string v_1 )
             if ( parameter.find("bbcount") != std::string::npos )
             {
                 nodes[components_in_netlist].bbcount = get_component_bbcount (parameters[indx] );
-                
+
                 //cout << nodes[components_in_netlist].name << " bbcount " << nodes[components_in_netlist].bbcount << endl;
                 //cout << nodes[components_in_netlist].name << " inputs.size " << nodes[components_in_netlist].inputs.size << endl;
-                
+
                 if ( nodes[components_in_netlist].bbcount == 0 )
                 {
                     nodes[components_in_netlist].bbcount = 1;
@@ -733,10 +733,10 @@ void parse_components ( string v_0, string v_1 )
                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].type = "c";
                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].bit_size = 32;
                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].info_type = "fake"; //Andrea 20200128 Try to force 0 to inputs.
-                    nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].port = 0; //Andrea 20200211 
+                    nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].port = 0; //Andrea 20200211
 
                 }
-                
+
                 //cout << nodes[components_in_netlist].name << " inputs.size " << nodes[components_in_netlist].inputs.size << endl;
 
             }
@@ -755,8 +755,8 @@ void parse_components ( string v_0, string v_1 )
 //                     nodes[components_in_netlist].inputs.size += 1;
 //                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].type = "l";
 //                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].info_type = "d";
-//                     
-                    
+//
+
                     nodes[components_in_netlist].outputs.size += 1;
                     nodes[components_in_netlist].outputs.output[nodes[components_in_netlist].outputs.size-1].type = "l";
                     //Lana 9.6.2021 change to data and data bitwidth
@@ -764,7 +764,7 @@ void parse_components ( string v_0, string v_1 )
                     nodes[components_in_netlist].outputs.output[nodes[components_in_netlist].outputs.size-1].bit_size = nodes[components_in_netlist].data_size;
                     nodes[components_in_netlist].outputs.output[nodes[components_in_netlist].outputs.size-1].port = 0; //Andrea 20200424
 
-                    
+
 
                 }
             }
@@ -781,7 +781,7 @@ void parse_components ( string v_0, string v_1 )
                     //Lana 9.6.2021 change to address bitwidth
                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].bit_size = nodes[components_in_netlist].address_size;//32; //Andrea 20200424
 
-                    
+
                     nodes[components_in_netlist].inputs.size += 1;
                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].type = "s";
                     nodes[components_in_netlist].inputs.input[nodes[components_in_netlist].inputs.size-1].info_type = "d";
@@ -834,7 +834,7 @@ void parse_components ( string v_0, string v_1 )
             if ( parameter.find("numStores") != std::string::npos )
             {
                 nodes[components_in_netlist].numStores = get_component_numstores( parameters[indx] );
-            }        
+            }
             if ( parameter.find("loadOffsets") != std::string::npos )
             {
                 nodes[components_in_netlist].loadOffsets = get_component_numstores( parameters[indx] );
@@ -851,7 +851,7 @@ void parse_components ( string v_0, string v_1 )
             {
                 //nodes[components_in_netlist].storePorts = get_component_numstores( parameters[indx] );
                 nodes[components_in_netlist].storePorts = stripExtension( get_component_numstores( parameters[indx] ), "];" );
-                
+
             }
             if ( parameter.find("orderings") != std::string::npos){
                 nodes[components_in_netlist].orderings = get_component_orderings(parameters[indx]);
@@ -861,7 +861,10 @@ void parse_components ( string v_0, string v_1 )
                 nodes[components_in_netlist].constants = get_component_constants ( parameters[indx] );
             }
 
-            
+		// Jiahui 08.09.2023: new attribute latency for the Delayer unit
+		if ( parameter.find("latency") != std::string::npos) {
+			nodes[components_in_netlist].latency = std::atoi(get_value(parameters[indx]).c_str());
+		}
         }
 //                 if ( nodes[components_in_netlist].type == "Entry" )
 //                 {
@@ -873,9 +876,9 @@ void parse_components ( string v_0, string v_1 )
 //                     nodes[components_in_netlist].inputs.input->bit_size = 32;
 //                     //nodes[components_in_netlist].outputs.output->bit_size = 32;
 //                 }
-        
-        
-        
+
+
+
         if ( nodes[components_in_netlist].type == "Buffer" && nodes[components_in_netlist].slots == 1 )
         {
             if ( nodes[components_in_netlist].trasparent )
@@ -896,7 +899,7 @@ void parse_components ( string v_0, string v_1 )
             }
             nodes[components_in_netlist].component_operator = nodes[components_in_netlist].type;
         }
-        
+
         if ( nodes[components_in_netlist].type == "Fifo")
         {
             if ( nodes[components_in_netlist].trasparent )
@@ -909,9 +912,9 @@ void parse_components ( string v_0, string v_1 )
             }
             nodes[components_in_netlist].component_operator = nodes[components_in_netlist].type;
         }
-        
-        
-        
+
+
+
         components_in_netlist++;
         if ( components_in_netlist >= MAX_NODES )
         {
@@ -924,7 +927,7 @@ void parse_components ( string v_0, string v_1 )
 void parse_line ( string line )
 {
     vector<string> v;
-    
+
     line = check_comments ( line );
     string_split( line, '[', v);
 
@@ -947,14 +950,14 @@ void parse_line ( string line )
 
 void parse_dot ( string filename )
 {
-    
+
     string input_filename = filename + ".dot";
     ifstream inFile(input_filename);
     string strline;
 
     components_in_netlist = 0;
 
-    if (inFile.is_open()) 
+    if (inFile.is_open())
     {
         while ( inFile )
         {

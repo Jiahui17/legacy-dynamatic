@@ -22,7 +22,7 @@ using namespace std;
 #define MAX_INPUTS  512//64
 #define MAX_OUTPUTS 512// 64
 
-#define COMPONENT_NOT_FOUND -1 
+#define COMPONENT_NOT_FOUND -1
 
 typedef struct input
 {
@@ -78,10 +78,11 @@ typedef struct node
     int     data_size = 32;
     int     address_size = 32;
     bool    mem_address;
-    int     bbId = -1; 
-    int     portId = -1; 
+    int     bbId = -1;
+    int     portId = -1;
     int     offset = -1;
     int     lsq_indx = -1;
+    int     latency = -1;
     //for sel
     vector<vector<int>> orderings;
 

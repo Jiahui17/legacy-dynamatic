@@ -1150,6 +1150,7 @@ string get_component_entity ( string component, int component_id )
 		}
 	}
 
+	// This a sanity check that checks if the type if defined or not
 	if (component_entity.size() == 0) {
 		cerr << "Cannot determine the type of the unit "<< component <<", aborting!" << endl;
 		abort();
@@ -1592,6 +1593,26 @@ string get_generic ( int node_id )
 		generic += to_string(nodes[node_id].inputs.input[0].bit_size);
 		generic += COMMA;
 		generic += to_string(nodes[node_id].outputs.output[nodes[node_id].outputs.size - 1].bit_size);
+	}
+
+	if ( nodes[node_id].type.find("Delayer") != std::string::npos )
+	{
+		generic = to_string(nodes[node_id].inputs.size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].outputs.size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].inputs.input[0].bit_size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].outputs.output[0].bit_size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].latency);
+	}
+
+	// Jiahui 09.08.2023: I don't think we use any unit that has an empty
+	// generic line, therefore I add a sanity check here.
+	if ( generic.size() == 0 ) {
+		cerr << "Unhandled generic value generation for type " << nodes[node_id].type << ", aborting!" << endl;
+		abort();
 	}
 
 	return generic;
