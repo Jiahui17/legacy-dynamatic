@@ -95,6 +95,7 @@
 #define COMPONENT_DISTRIBUTOR   "Distributor"
 #define COMPONENT_SELECTOR		"Selector"
 #define COMPONENT_INJECTOR		"Inj"
+#define COMPONENT_DELAYER		"Delayer" // Jiahui 08.09.2023: new unit for latency balancing
 
 
 #define UNDERSCORE  "_"
@@ -108,11 +109,11 @@
 #define DEFAULT_BITWIDTH    32
 
 class vhdl_writer {
-    
+
 public:
     void write_vhdl ( string filename, int indx );
     void write_tb_wrapper ( string filename  );
-    
+
 private:
 
 
@@ -122,13 +123,13 @@ private:
 
 enum
 {
-    ENTITY_MERGE_INDX,            
-    ENTITY_READ_MEMORY_INDX,      
-    ENTITY_SINGLE_OP_INDX,        
-    ENTITY_GET_PTR_INDX,          
-    ENTITY_INT_MUL_INDX,          
-    ENTITY_INT_ADD_INDX, 
-    ENTITY_INT_SUB_INDX, 
+    ENTITY_MERGE_INDX,
+    ENTITY_READ_MEMORY_INDX,
+    ENTITY_SINGLE_OP_INDX,
+    ENTITY_GET_PTR_INDX,
+    ENTITY_INT_MUL_INDX,
+    ENTITY_INT_ADD_INDX,
+    ENTITY_INT_SUB_INDX,
     ENTITY_BUF_INDX,
     ENTITY_TEHB_INDX,
     ENTITY_OEHB_INDX,
@@ -140,7 +141,7 @@ enum
     ENTITY_CONSTANT_INDX,
     ENTITY_BRANCH_INDX,
     ENTITY_END_INDX,
-    ENTITY_START_INDX,   
+    ENTITY_START_INDX,
     ENTITY_WRITE_MEMORY_INDX,
     ENTITY_SOURCE_INDX,
     ENTITY_SINK_INDX,
