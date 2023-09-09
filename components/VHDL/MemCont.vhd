@@ -147,13 +147,15 @@ begin
 	g_sanity_checker : for I in 0 to ARBITER_SIZE - 1 generate
 		p_sanity_checker : process(clk) is
 		begin
-			assert ( (not full(I)) or (not sel_prev(I)) )
-			report "By construction, when the cell is full, the memory access should not be granted!"
-			severity failure;
+			if rising_edge(clk) then
+				assert ( (not full(I)) or (not sel_prev(I)) )
+				report "By construction, when the cell is full, the memory access should not be granted!"
+				severity failure;
 
-			assert ( valid(I) = ( full(I) or sel_prev(I) ) )
-			report "valid must be equivalent to (full or sel_prev)."
-			severity failure;
+				assert ( valid(I) = ( full(I) or sel_prev(I) ) )
+				report "valid must be equivalent to (full or sel_prev)."
+				severity failure;
+			end if;
 		end process;
 	end generate;
 
