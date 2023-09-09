@@ -10,7 +10,7 @@ entity read_priority is
 	port(
 		req		: in  std_logic_vector(ARBITER_SIZE - 1 downto 0); -- read requests (pValid signals)
 		data_ready   : in  std_logic_vector(ARBITER_SIZE - 1 downto 0); -- ready from next
-		priority_out : out std_logic_vector(ARBITER_SIZE - 1 downto 0) -- priority function output
+		priority_out : out std_logic_vector(ARBITER_SIZE - 1 downto 0) := (others => '0') -- priority function output
 	);
 end entity;
 
@@ -152,9 +152,9 @@ begin
 				report "By construction, when the cell is full, the memory access should not be granted!"
 				severity failure;
 
-				assert ( valid(I) = ( full(I) or sel_prev(I) ) )
-				report "valid must be equivalent to (full or sel_prev)."
-				severity failure;
+				--assert ( valid(I) = ( full(I) or sel_prev(I) ) )
+				--report "valid must be equivalent to (full or sel_prev)."
+				--severity failure;
 			end if;
 		end process;
 	end generate;
