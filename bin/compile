@@ -104,3 +104,5 @@ func_name=$(echo "$name" | cut -f 1 -d '.')
 mv *_bbgraph.dot $REPORT_DIR/$func_name"_bbgraph.dot"
 mv *.dot $REPORT_DIR/$func_name".dot"
 mv *.txt $DEBUG_DIR/
+
+exit 0
