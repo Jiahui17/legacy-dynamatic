@@ -33,16 +33,15 @@ cd ${SCRIPT_DIR}/Regression_test/hls_verifier/HlsVerifier && mkdir -p build && m
 
 cd ${SCRIPT_DIR}/bin && chmod +x ./*
 
-cd ${SCRIPT_DIR}/../.. && touch init_dhls.sh
-
-echo '' > init_dhls.sh
-echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/bin" >> init_dhls.sh
-echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/Buffers/bin" >> init_dhls.sh
-echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/dot2hdl/bin" >> init_dhls.sh
-echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/dot2vhdl/bin" >> init_dhls.sh
-echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/Regression_test/hls_verifier/HlsVerifier/build/" >> init_dhls.sh
-echo "export DHLS_INSTALL_DIR=$(pwd)" >> init_dhls.sh
-echo "export OPT_DIR=${LLVM}/bin" >> init_dhls.sh
-echo "export CLANG_DIR=${LLVM}/bin" >> init_dhls.sh
-echo "export ELASTIC_DIR=$(pwd)/etc/dynamatic/elastic-circuits" >> init_dhls.sh
+cd ${SCRIPT_DIR}/../.. && {
+	echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/bin"
+	echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/Buffers/bin"
+	echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/dot2hdl/bin"
+	echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/dot2vhdl/bin"
+	echo "export PATH=\$PATH:$(pwd)/etc/dynamatic/Regression_test/hls_verifier/HlsVerifier/build/"
+	echo "export DHLS_INSTALL_DIR=$(pwd)"
+	echo "export OPT_DIR=${LLVM}/bin"
+	echo "export CLANG_DIR=${LLVM}/bin"
+	echo "export ELASTIC_DIR=$(pwd)/etc/dynamatic/elastic-circuits"
+} > init_dhls.sh
 
