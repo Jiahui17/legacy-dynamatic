@@ -82,47 +82,53 @@ entity delayer is
 	readyArray    : out std_logic_vector(INPUTS - 1 downto 0)
 );
 
-end delayer;
-
-architecture arch of delayer is
-	constant counter_width : integer := integer(ceil(log2(real(LATENCY))));
-	signal full_reg    : std_logic := '0';
-	signal data_reg    : std_logic_vector(DATA_SIZE_IN-1 downto 0) := (others => '0');
-	signal count_down  : std_logic_vector(counter_width - 1 downto 0) := (others => '0');
-	signal output_transfer : std_logic := '0';
-	signal input_transfer  : std_logic := '0';
-
-	signal valid_internal : std_logic := '0';
-	signal ready_internal : std_logic := '0';
-	constant COUNTER_ZERO : std_logic_vector(counter_width - 1 downto 0) := (others => '0');
-
-	signal one: std_logic_vector (0 downto 0) := "1";
-	signal zero: std_logic_vector (0 downto 0) := "0";
-
-	signal b_counter_zero : std_logic := '0';
 begin
 	assert INPUTS  = 1 severity failure;
 	assert OUTPUTS = 1 severity failure;
 	assert LATENCY  > 0 severity failure;
 	assert DATA_SIZE_IN  > 0 severity failure;
 	assert DATA_SIZE_OUT > 0 severity failure;
+end delayer;
+
+architecture arch of delayer is
+	constant counter_width : integer := integer(ceil(log2(real(LATENCY))));
+	signal full_reg    : std_logic := '0';
+	signal data_reg    : std_logic_vector(DATA_SIZE_IN-1 downto 0) := (others => '0');
+	signal counter_reg  : unsigned (counter_width - 1 downto 0) := (others => '0');
+	signal output_transfer : std_logic := '0';
+	signal input_transfer  : std_logic := '0';
+
+	signal valid_internal : std_logic := '0';
+	signal ready_internal : std_logic := '0';
+	constant COUNTER_ZERO : unsigned (counter_width - 1 downto 0) := (others => '0');
+
+	signal one: std_logic_vector (0 downto 0) := "1";
+	signal zero: std_logic_vector (0 downto 0) := "0";
+
+	signal b_counter_latency : std_logic := '0';
+begin
 
 	output_transfer <= (valid_internal and nReadyArray(0));
 	input_transfer <= (pValidArray(0) and ready_internal);
-	ready_internal <= (not full_reg);
+	ready_internal <= output_transfer or (not full_reg);
 
-	b_counter_zero <= '1' when (count_down = COUNTER_ZERO) else '0';
+	b_counter_latency <= '1' when (counter_reg = to_unsigned(LATENCY - 1, counter_width)) else '0';
 
+	validArray(0) <= valid_internal;
+	readyArray(0) <= ready_internal;
+
+	valid_internal <= (b_counter_latency and full_reg);
+	dataOutArray(0) <= data_reg;
 
 	p_update_counter : process (clk)
 	begin
 		if (rising_edge(clk)) then
+			-- counter_reg starts at LATENCY - 1 (because it takes 1
+			-- cycle to make full_reg = 1)
 			if (rst) or (output_transfer) then
-				-- count_down starts at LATENCY - 1 (because it takes 1
-				-- cycle to make full_reg = 1)
-				count_down <= std_logic_vector(to_unsigned(LATENCY - 1, counter_width));
-			elsif (full_reg) and (not b_counter_zero) then
-				count_down <= std_logic_vector(unsigned(count_down) - to_unsigned(1, counter_width));
+				counter_reg <= (others => '0');
+			elsif (full_reg) and (not b_counter_latency) then
+				counter_reg <= counter_reg + 1;
 			end if;
 		end if;
 	end process;
@@ -132,10 +138,10 @@ begin
 		if (rising_edge(clk)) then
 			if (rst) then
 				full_reg <= '0';
-			elsif (output_transfer) then
-				full_reg <= '0';
 			elsif (input_transfer) then
 				full_reg <= '1';
+			elsif (output_transfer) and (not input_transfer) then
+				full_reg <= '0';
 			end if;
 		end if;
 	end process;
@@ -151,10 +157,5 @@ begin
 		end if;
 	end process;
 
-	validArray(0) <= valid_internal;
-	readyArray(0) <= ready_internal;
-
-	valid_internal <= b_counter_zero and full_reg;
-	dataOutArray(0) <= data_reg;
 
 end arch;
