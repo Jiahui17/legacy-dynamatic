@@ -2209,11 +2209,13 @@ end entity;
 
 architecture arch of fadd_op is
 
+	constant LATENCY : integer := 6;
+
     -- Interface to Vivado component
-	component array_RAM_fadd_32bkb is
+	component dynamatic_units_6ns_fadd_32ns_32ns_32_7_full_dsp_1 is
 		generic (
-				  ID         : integer := 1;
-				  NUM_STAGE  : integer := 10;
+				  ID         : integer := 24;
+				  NUM_STAGE  : integer := LATENCY + 1;
 				  din0_WIDTH : integer := 32;
 				  din1_WIDTH : integer := 32;
 				  dout_WIDTH : integer := 32
@@ -2242,7 +2244,7 @@ begin
 	join_valid,                  
 	readyArray);   
 
-	buff: entity work.delay_buffer(arch) generic map(8)
+	buff: entity work.delay_buffer(arch) generic map(LATENCY - 1)
 	port map(clk,
 	rst,
 	join_valid,
@@ -2263,8 +2265,7 @@ begin
 			   dataOutArray(0) => oehb_dataOut
 		   );
 
-
-	array_RAM_fadd_32ns_32ns_32_10_full_dsp_1_U1 :  component array_RAM_fadd_32bkb
+	fadd_ip :  component dynamatic_units_6ns_fadd_32ns_32ns_32_7_full_dsp_1
 	port map (
 			   clk   => clk,
 			   reset => rst,
@@ -2302,11 +2303,13 @@ end entity;
 
 architecture arch of fsub_op is
 
-    -- Interface to Vivado component
-	component array_RAM_fsub_32bkb is
+	constant LATENCY : integer := 6;
+
+	-- Interface to Vivado component
+	component dynamatic_units_6ns_fsub_32ns_32ns_32_7_full_dsp_1 is
 		generic (
-				  ID         : integer := 1;
-				  NUM_STAGE  : integer := 10;
+				  ID         : integer := 28;
+				  NUM_STAGE  : integer := LATENCY + 1;
 				  din0_WIDTH : integer := 32;
 				  din1_WIDTH : integer := 32;
 				  dout_WIDTH : integer := 32
@@ -2334,7 +2337,7 @@ begin
 	join_valid,                  
 	readyArray);   
 
-	buff: entity work.delay_buffer(arch) generic map(8)
+	buff: entity work.delay_buffer(arch) generic map(LATENCY - 1)
 	port map(clk,
 	rst,
 	join_valid,
@@ -2355,7 +2358,7 @@ begin
 			   dataOutArray(0) => oehb_dataOut
 		   );
 
-	array_RAM_fsub_32ns_32ns_32_10_full_dsp_1_U1 :  component array_RAM_fsub_32bkb
+	fsub_ip :  component dynamatic_units_6ns_fsub_32ns_32ns_32_7_full_dsp_1
 	port map (
 			   clk   => clk,
 			   reset => rst,
@@ -2392,11 +2395,12 @@ end entity;
 
 architecture arch of fmul_op is
 
-    -- Interface to Vivado component
-	component array_RAM_fmul_32cud is
+	constant LATENCY : integer := 3;
+	-- Interface to Vivado component
+	component dynamatic_units_6ns_fmul_32ns_32ns_32_4_max_dsp_1 is
 		generic (
-				  ID         : integer := 1;
-				  NUM_STAGE  : integer := 6;
+				  ID         : integer := 32;
+				  NUM_STAGE  : integer := LATENCY + 1;
 				  din0_WIDTH : integer := 32;
 				  din1_WIDTH : integer := 32;
 				  dout_WIDTH : integer := 32
@@ -2424,7 +2428,7 @@ begin
 	join_valid,                  
 	readyArray);   
 
-	buff: entity work.delay_buffer(arch) generic map(4)
+	buff: entity work.delay_buffer(arch) generic map(LATENCY - 1)
 	port map(clk,
 	rst,
 	join_valid,
@@ -2445,7 +2449,7 @@ begin
 			   dataOutArray(0) => oehb_dataOut
 		   );
 
-	array_RAM_fmul_32ns_32ns_32_6_max_dsp_1_U1 :  component array_RAM_fmul_32cud
+	fmul_ip :  component dynamatic_units_6ns_fmul_32ns_32ns_32_4_max_dsp_1
 	port map (
 			   clk   => clk,
 			   reset => rst,
