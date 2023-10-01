@@ -40,11 +40,14 @@ compile "${TOP_FILE}" "${PROJ_DIR}" 2>&1 \
 	| tee "$PROJ_DIR/reports/elastic_pass.log" \
 	|| fail "error - elastic pass failed!"
 
+
+source /opt/gurobi*/grbenv.sh && LP_SOLVER=gurobi_cl || LP_SOLVER=cbc
+
 # run buffer pass
 echo "info - Start optimize."
 buffers buffers \
 	-filename="${PROJ_DIR}/reports/${PROJ_NAME}" \
-	-period=${CLOCK_PERIOD} -solver=cbc -timeout=360 2>&1 \
+	-period=${CLOCK_PERIOD} -solver=$LP_SOLVER -timeout=360 2>&1 \
 	| tee "${PROJ_DIR}/reports/buffers.log" \
 	|| fail 'error - buffers failed!'
 

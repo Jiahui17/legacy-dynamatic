@@ -22,6 +22,7 @@ __pycache__/
 *.dat
 *.fir
 *.gsol
+*.sol
 *.json
 *.log
 *.lp
