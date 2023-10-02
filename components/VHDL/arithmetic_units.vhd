@@ -547,6 +547,88 @@ begin
 end arch;
 
 
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+USE work.customTypes.all;
+entity select_op_counter is 
+	Generic (
+			  INPUTS : integer ; OUTPUTS : integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
+		  );
+-- llvm select: operand(0) is condition, operand(1) is true, operand(2) is false
+-- here, dataInArray(0) is true, dataInArray(1) is false operand
+	port (
+	clk, rst :      in std_logic;
+	dataInArray :   in data_array (1 downto 0)(DATA_SIZE_IN - 1 downto 0);
+	dataOutArray :  out data_array (0 downto 0)(DATA_SIZE_OUT - 1 downto 0);    
+	pValidArray :   in std_logic_vector(2 downto 0);
+	nReadyArray :   in std_logic_vector(0 downto 0);
+	validArray :    out std_logic_vector(0 downto 0);
+	readyArray :    out std_logic_vector(2 downto 0);
+	condition: in data_array (0 downto 0)(0 downto 0)
+);
+
+  end select_op_counter;
+
+architecture arch of select_op_counter is
+	signal  ee, validInternal : std_logic;
+	signal  kill0, kill1 : std_logic;
+	signal  antitokenStop:  std_logic;
+	signal  g0, g1: std_logic;
+	signal counter1 : natural range 0 to 31;
+	signal send_internal_0: std_logic;
+	signal send_internal_1: std_logic;
+	signal kill0_temp: std_logic;
+	signal pValid0_temp: std_logic;
+	signal counter_zero: std_logic;
+
+begin
+
+	ee <= pValidArray(0) and ((not condition(0)(0) and pValidArray(2)) or (condition(0)(0) and pValidArray(1) and counter_zero)); --condition and one input
+	validInternal <= ee and not antitokenStop; -- propagate ee if not stopped by antitoken
+
+	g0 <= not pValidArray(1) and validInternal and nReadyArray(0);
+	g1 <= not pValidArray(2) and validInternal and nReadyArray(0);
+
+	validArray(0) <= validInternal;
+	readyArray(1) <= (not pValidArray(1)) or (validInternal and nReadyArray(0)) or kill0_temp; -- normal join or antitoken
+	readyArray(2) <= (not pValidArray(2)) or (validInternal and nReadyArray(0)) or kill1; --normal join or antitoken
+	readyArray(0) <= (not pValidArray(0)) or (validInternal and nReadyArray(0)); --like normal join
+
+	dataOutArray(0) <= dataInArray(1) when (condition(0)(0) = '0') else dataInArray(0);
+
+	Antitokens: entity work.antitokens
+	port map ( clk, rst, 
+	pValidArray(2), pvalid0_temp, 
+	kill1, kill0,
+	g1, g0, 
+	antitokenStop);
+
+	kill0_temp <= '1' when (counter1 > 0) else '0';
+	pValid0_temp <= '1' when (counter1 < 32) else '0';
+	counter_zero <= '1' when (counter1 = 0) else '0';
+
+	Counter: process (clk)
+		variable counter : natural range 0 to 31;
+	begin
+		if rising_edge(clk) then
+			if (kill0 = '1')   then
+				counter:= counter + 1;
+			end if;
+
+			if (send_internal_0 = '1') then
+				counter:= counter -1;
+			end if;
+
+			counter1 <= counter;
+		end if;
+	end process;
+
+	send_internal_0 <= '1' when ((counter1 > 0 ) and pValidArray(1) = '1' and send_internal_1 = '0')  else '0';
+	send_internal_1 <= '1' when (pValidArray(0) = '1' and (condition(0)(0) = '0' and pValidArray(2) = '1')) else '0';
+
+end arch;
+
 -----------------------------------------------------------------------
 -- icmp eq, version 0.0
 -----------------------------------------------------------------------
