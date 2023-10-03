@@ -9,7 +9,7 @@
 
 #define AMOUNT_OF_TEST 1
 
-int matvec (in_int_t M[30][30], in_int_t V[30], out_int_t Out[30]) {
+void matvec (in_int_t M[30][30], in_int_t V[30], out_int_t Out[30]) {
 	int i, j;
 	int tmp = 0;
 
@@ -22,7 +22,7 @@ int matvec (in_int_t M[30][30], in_int_t V[30], out_int_t Out[30]) {
 		Out[i] = tmp;
 	}
 
-	return tmp;
+	//return tmp;
 
 }
 
@@ -30,7 +30,7 @@ int main(void){
 	in_int_t M[AMOUNT_OF_TEST][30][30];
 	in_int_t V[AMOUNT_OF_TEST][30];
 	out_int_t Out[AMOUNT_OF_TEST][30];
-    
+
 	for(int i = 0; i < AMOUNT_OF_TEST; ++i){
     	for(int y = 0; y < 30; ++y){
       		V[i][y] = rand()%100;
