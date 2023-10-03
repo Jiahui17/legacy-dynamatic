@@ -9,7 +9,7 @@
 
 #define AMOUNT_OF_TEST 1
 
-int iir (in_int_t y[1000], in_int_t x[1000], in_int_t a, in_int_t b) {
+void iir (inout_int_t y[1000], in_int_t x[1000], in_int_t a, in_int_t b) {
 	int i;
 	int tmp=y[0];
 
@@ -18,16 +18,14 @@ int iir (in_int_t y[1000], in_int_t x[1000], in_int_t a, in_int_t b) {
 		y[i] = tmp;
 
 	}
-	return tmp;
-
 }
 
 int main(void){
-	in_int_t y[AMOUNT_OF_TEST][1000];
+	inout_int_t y[AMOUNT_OF_TEST][1000];
 	in_int_t x[AMOUNT_OF_TEST][1000];
 	in_int_t b[AMOUNT_OF_TEST];
 	in_int_t a[AMOUNT_OF_TEST];
-    
+
 	srand(13);
 	for(int i = 0; i < AMOUNT_OF_TEST; ++i){
 		a[i] = rand();
