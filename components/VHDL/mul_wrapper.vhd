@@ -25,14 +25,34 @@ end entity;
 
 architecture arch of mul_op is
 
+-- multiplier latency (4 or 8)
+constant LATENCY : integer := 2;
+--constant LATENCY : integer := 8;
+
+	-- NOTE: This multiplier is used for the experiment for FPGA'24 (we target CP = 6)
+	component dynamatic_units_6ns_mul_32s_32s_32_3_1 is
+		generic (
+				  ID : INTEGER := 1;
+				  NUM_STAGE : INTEGER := LATENCY + 1;
+				  din0_WIDTH : INTEGER := 32;
+				  din1_WIDTH : INTEGER := 32;
+				  dout_WIDTH : INTEGER := 32
+			  );
+		port (
+			     clk : IN STD_LOGIC;
+			     reset : IN STD_LOGIC;
+			     ce : IN STD_LOGIC;
+			     din0 : IN STD_LOGIC_VECTOR(din0_WIDTH - 1 DOWNTO 0);
+			     din1 : IN STD_LOGIC_VECTOR(din1_WIDTH - 1 DOWNTO 0);
+			     dout : OUT STD_LOGIC_VECTOR(dout_WIDTH - 1 DOWNTO 0));
+	end component;
+
+
 signal join_valid : STD_LOGIC;
 
 signal buff_valid, oehb_valid, oehb_ready : STD_LOGIC;
 signal oehb_dataOut, oehb_datain : std_logic_vector(0 downto 0);
 
--- multiplier latency (4 or 8)
-constant LATENCY : integer := 4;
---constant LATENCY : integer := 8;
 
 begin 
 join: entity work.join(arch) generic map(2)
@@ -41,15 +61,25 @@ oehb_ready,
 join_valid,                  
   readyArray);   
 
-        -- instantiated multiplier (work.mul_4_stage or work.mul_8_stage)
-multiply_unit:  entity work.mul_4_stage(behav) generic map (INPUTS, OUTPUTS, DATA_SIZE_IN, DATA_SIZE_OUT)
---multiply_unit:  entity work.mul_8_stage(behav) generic map (INPUTS, OUTPUTS, DATA_SIZE_IN, DATA_SIZE_OUT)
-port map (
-clk => clk,
-ce => oehb_ready,
-a => dataInArray(0),
-b => dataInArray(1),
-p => dataOutArray(0));
+--        -- instantiated multiplier (work.mul_4_stage or work.mul_8_stage)
+--multiply_unit:  entity work.mul_4_stage(behav) generic map (INPUTS, OUTPUTS, DATA_SIZE_IN, DATA_SIZE_OUT)
+----multiply_unit:  entity work.mul_8_stage(behav) generic map (INPUTS, OUTPUTS, DATA_SIZE_IN, DATA_SIZE_OUT)
+--port map (
+--clk => clk,
+--ce => oehb_ready,
+--a => dataInArray(0),
+--b => dataInArray(1),
+--p => dataOutArray(0));
+
+mul_ip : component dynamatic_units_6ns_mul_32s_32s_32_3_1
+port map(
+		  clk => clk,
+		  reset => rst,
+		  ce => oehb_ready,
+		  din0 => dataInArray(0),
+		  din1 => dataInArray(1),
+		  dout => dataOutArray(0)
+	  );
 
 buff: entity work.delay_buffer(arch) generic map(LATENCY-1)
 port map(clk,
@@ -71,7 +101,6 @@ oehb: entity work.OEHB(arch) generic map (1, 1, 1, 1)
             dataInArray(0) => oehb_datain,
             dataOutArray(0) => oehb_dataOut
         );
-
 
 end architecture;
 
