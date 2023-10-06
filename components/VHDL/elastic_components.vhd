@@ -826,7 +826,7 @@ begin
 	start_internal <= not running and pValidArray(0);
 	readyArray(0) <= not running and startBuff_readyArray(0);
 
-	startBuff: entity work.elasticBuffer(arch) generic map (1, 1, DATA_SIZE_IN, DATA_SIZE_IN)
+	startBuff: entity work.TEHB(arch) generic map (1, 1, DATA_SIZE_IN, DATA_SIZE_IN)
 	port map (
 			clk => clk,
 			rst => rst,
