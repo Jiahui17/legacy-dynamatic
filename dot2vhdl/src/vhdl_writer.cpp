@@ -58,7 +58,8 @@ string entity_name[] = {
 	ENTITY_DISTRIBUTOR,
 	ENTITY_INJECTOR,
 	ENTITY_SELECTOR,
-	ENTITY_DELAYER  // Jiahui 08.09.2023: new unit for latency balancing
+	ENTITY_DELAYER,  // Jiahui 08.09.2023: new unit for latency balancing
+	ENTITY_GATE      // Jiahui 23.10.2023: new unit for ordering network
 };
 
 string component_types[] = {
@@ -92,7 +93,8 @@ string component_types[] = {
 	COMPONENT_DISTRIBUTOR,
 	COMPONENT_INJECTOR,
 	COMPONENT_SELECTOR,
-	COMPONENT_DELAYER  // Jiahui 08.09.2023: new unit for latency balancing
+	COMPONENT_DELAYER,  // Jiahui 08.09.2023: new unit for latency balancing
+	COMPONENT_GATE // Jiahui 23.10.2023: new unit for ordering network
 };
 
 string inputs_name[] = {
@@ -1606,6 +1608,17 @@ string get_generic ( int node_id )
 		generic += to_string(nodes[node_id].outputs.output[0].bit_size);
 		generic += COMMA;
 		generic += to_string(nodes[node_id].latency);
+	}
+
+	if ( nodes[node_id].type.find("Gate") != std::string::npos )
+	{
+		generic = to_string(nodes[node_id].inputs.size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].outputs.size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].inputs.input[0].bit_size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].outputs.output[0].bit_size);
 	}
 
 	// Jiahui 09.08.2023: I don't think we use any unit that has an empty

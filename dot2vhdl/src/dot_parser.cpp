@@ -299,7 +299,9 @@ int get_input_size ( string in )
     vector<string> bit_sizes;
     int ret_val = 32;
 
+    cerr << "[TEST] in " << in << endl;
     string_split( in, ':', bit_sizes );
+    cerr << "[TEST] bit_sizes[1] " << bit_sizes[1] << endl;
 
     if ( bit_sizes.size() )
     {
@@ -317,6 +319,7 @@ int get_input_size ( string in )
         }
 
     }
+    cerr << "[TEST] bitwidth " << bit_sizes[1] << endl;
 
     return ret_val;
 
@@ -634,6 +637,7 @@ void parse_components ( string v_0, string v_1 )
     string parameter;
 
     nodes[components_in_netlist].name = get_component_name ( v_0 );
+    cerr << "[TEST]" << v_0 << endl;
     if ( !( nodes[components_in_netlist].name.empty() ) ) //Check if the name is not empty
     {
 

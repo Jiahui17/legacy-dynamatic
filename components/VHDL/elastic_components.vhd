@@ -1678,4 +1678,41 @@ begin
 end architecture;
 
 
+Library IEEE;
+use IEEE.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.customTypes.all;
 
+entity gate is
+	Generic (
+			  INPUTS: integer; OUTPUTS: integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
+		  );
+	port (
+	clk, rst : in std_logic; 
+	dataInArray : in data_array (1 downto 0)(DATA_SIZE_IN-1 downto 0); 
+	dataOutArray : out data_array (0 downto 0)(DATA_SIZE_OUT-1 downto 0);      
+	pValidArray : in std_logic_vector(1 downto 0);
+	nReadyArray : in std_logic_vector(0 downto 0);
+	validArray : out std_logic_vector(0 downto 0);
+	readyArray : out std_logic_vector(1 downto 0));
+begin
+	assert OUTPUTS = 1 severity failure;
+	assert DATA_SIZE_IN = DATA_SIZE_OUT severity failure;
+end entity;
+
+architecture arch of gate is
+
+	signal join_valid : STD_LOGIC;
+
+begin 
+
+	join_write_temp:   entity work.join(arch) generic map(2)
+	port map( pValidArray,  --pValidArray
+	nReadyArray(0),     --nready                    
+	join_valid,         --valid          
+	readyArray);   --readyarray 
+
+	dataOutArray(0) <= dataInArray(0);
+	validArray(0) <= join_valid;
+
+end architecture;
