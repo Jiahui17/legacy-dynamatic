@@ -1716,3 +1716,46 @@ begin
 	validArray(0) <= join_valid;
 
 end architecture;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.customTypes.all;
+
+entity sequencer is
+	Generic (
+			  INPUTS: integer; OUTPUTS: integer; DATA_SIZE_IN: integer; DATA_SIZE_OUT: integer
+		  );
+	port (
+	clk, rst : in std_logic; 
+	dataInArray : in data_array (INPUTS-1 downto 0)(DATA_SIZE_IN-1 downto 0); 
+	dataOutArray : out data_array (OUTPUTS-1 downto 0)(DATA_SIZE_OUT-1 downto 0);      
+	pValidArray : in std_logic_vector(INPUTS-1 downto 0);
+	nReadyArray : in std_logic_vector(OUTPUTS-1 downto 0);
+	validArray : out std_logic_vector(OUTPUTS-1 downto 0);
+	readyArray : out std_logic_vector(INPUTS-1 downto 0));
+begin
+	assert OUTPUTS = INPUTS severity failure;
+	assert OUTPUTS > 1 severity failure;
+	assert DATA_SIZE_IN = DATA_SIZE_OUT severity failure;
+end entity;
+
+architecture arch of sequencer is
+
+	signal join_valid : STD_LOGIC;
+
+begin 
+
+	allPValidAndGate : entity work.andN generic map(INPUTS)
+	port map(   pValidArray,
+	join_valid);
+
+	gen : for I in 0 to INPUTS-1 generate
+		-- the sequencer is valid only if everything before it is valid
+		dataOutArray(I) <= dataInArray(I);
+		validArray(I) <= join_valid;
+		-- assuming the data outputs are connected to a join, we can't AND any of the 
+		readyArray(I) <= nReadyArray(0) and nReadyArray(OUTPUTS-1);
+	end generate gen;
+
+end architecture;

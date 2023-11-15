@@ -58,8 +58,9 @@ string entity_name[] = {
 	ENTITY_DISTRIBUTOR,
 	ENTITY_INJECTOR,
 	ENTITY_SELECTOR,
-	ENTITY_DELAYER,  // Jiahui 08.09.2023: new unit for latency balancing
-	ENTITY_GATE      // Jiahui 23.10.2023: new unit for ordering network
+	ENTITY_DELAYER,   // Jiahui 08.09.2023: new unit for latency balancing
+	ENTITY_GATE,      // Jiahui 23.10.2023: new unit for ordering network
+	ENTITY_SEQUENCER, // Jiahui 14.11.2023: new unit for ordering network
 };
 
 string component_types[] = {
@@ -94,7 +95,8 @@ string component_types[] = {
 	COMPONENT_INJECTOR,
 	COMPONENT_SELECTOR,
 	COMPONENT_DELAYER,  // Jiahui 08.09.2023: new unit for latency balancing
-	COMPONENT_GATE // Jiahui 23.10.2023: new unit for ordering network
+	COMPONENT_GATE,     // Jiahui 23.10.2023: new unit for ordering network
+	COMPONENT_SEQUENCER // Jiahui 14.11.2023: new unit for ordering network
 };
 
 string inputs_name[] = {
@@ -1611,6 +1613,17 @@ string get_generic ( int node_id )
 	}
 
 	if ( nodes[node_id].type.find("Gate") != std::string::npos )
+	{
+		generic = to_string(nodes[node_id].inputs.size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].outputs.size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].inputs.input[0].bit_size);
+		generic += COMMA;
+		generic += to_string(nodes[node_id].outputs.output[0].bit_size);
+	}
+
+	if ( nodes[node_id].type.find("Sequencer") != std::string::npos )
 	{
 		generic = to_string(nodes[node_id].inputs.size);
 		generic += COMMA;

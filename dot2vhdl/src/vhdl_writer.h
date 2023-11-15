@@ -65,6 +65,7 @@
 #define ENTITY_INJECTOR			"Inj"
 #define ENTITY_DELAYER		"Delayer" // Jiahui 08.09.2023: new unit for latency balancing
 #define ENTITY_GATE		"gate"    // Jiahui 23.10.2023: new unit for ordering networkx
+#define ENTITY_SEQUENCER	"sequencer"    // Jiahui 23.10.2023: new unit for ordering networkx
 
 #define COMPONENT_MERGE         "Merge"
 #define COMPONENT_READ_MEMORY   "load"
@@ -99,6 +100,7 @@
 #define COMPONENT_INJECTOR		"Inj"
 #define COMPONENT_DELAYER		"Delayer" // Jiahui 08.09.2023: new unit for latency balancing
 #define COMPONENT_GATE		"Gate" // Jiahui 08.09.2023: new unit for latency balancing
+#define COMPONENT_SEQUENCER	"Sequencer" // Jiahui 08.09.2023: new unit for latency balancing
 
 
 #define UNDERSCORE  "_"
@@ -158,6 +160,7 @@ enum
     ENTITY_INJECTOR_INDX,
     ENTITY_DELAYER_INDX,
     ENTITY_GATE_INDX,
+    ENTITY_SEQUENCER_INDX,
     ENTITY_MAX
 };
 
