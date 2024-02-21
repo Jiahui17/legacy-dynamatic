@@ -37,7 +37,12 @@ EndComponent::EndComponent(Component& c){
 	//	port_valid = substring(name, 0, name.find('_')) + "_" + "pvalid";
 	//	port_ready = substring(name, 0, name.find('_')) + "_" + "pready";
 
-	std::string end_name = substring(name, 0, name.rfind("_"));
+	std::string end_name;
+	if (name.rfind("_") != std::string::npos) {
+		end_name = substring(name, 0, name.rfind("_"));
+	} else {
+		end_name = name;
+	}
 
 	port_dout = end_name + "_out";
 	port_valid = end_name + "_valid";
