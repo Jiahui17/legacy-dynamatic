@@ -1,6 +1,6 @@
-# The Dynamatic HLS Compiler
+# The (Legacy) Dynamatic HLS Compiler
 
-For official repository please checkout https://github.com/lana555/dynamatic
+**NOTE: this repository is obsolete**, please checkout https://github.com/EPFL-LAP/dynamatic
 
 ## Installation (Tested on Ubuntu/Debian based distributions)
 
