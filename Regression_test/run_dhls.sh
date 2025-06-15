@@ -34,6 +34,8 @@ DEFAULT_PERIOD=6
 	echo "info - clock period is not set: using default cp=${DEFAULT_PERIOD}" && \
 	CLOCK_PERIOD=${DEFAULT_PERIOD}
 
+mkdir -p "$PROJ_DIR/reports"
+
 # run the elastic pass
 echo "info - Start synthesize."
 compile "${TOP_FILE}" "${PROJ_DIR}" 2>&1 \
